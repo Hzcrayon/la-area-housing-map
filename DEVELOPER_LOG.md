@@ -3,8 +3,8 @@
 **项目 / Project:** LA Area Housing Map  
 **中文名 / Chinese name:** LA 周边住房地图
 
-**当前版本 / Current version:** 1.3  
-**页面入口 / Page entry:** `index.html`（标题、页眉徽章与 `<meta name="application-version">` 均为 `1.3`）  
+**当前版本 / Current version:** 1.31  
+**页面入口 / Page entry:** `index.html`（标题、页眉徽章与 `<meta name="application-version">` 均为 `1.31`）  
 **日志文件 / This file:** `DEVELOPER_LOG.md`
 
 以后每一次功能、数据或底图更新，都要在本文第 3 节追加一条记录，并把 `index.html` 里的版本号改成同一个号。页面标题、页眉上的 `vX.Y` 徽章，以及 `application-version`，必须和这里的当前版本一致。
@@ -32,7 +32,7 @@ After every later change to features, data, or basemaps, append an entry in sect
 
 当前选中的底图按钮为靛蓝色。
 
-**白天 / 夜间。** 顶栏有「白天模式 / 夜间模式」按钮。打开页面时是夜间：顶栏、侧栏、图例和弹窗都是深色，和原来的界面一致。点「白天模式」后，这些面板换成白底浅灰，文字改为深色，价格数字仍用靛蓝、绿色、天蓝和玫红区分。网格上的价格标签在白天是白底深字。地图底图本身不跟着翻转。再点「夜间模式」回到深色。选择会记在浏览器里，下次打开仍是上次的模式。
+**白天 / 夜间。** 顶栏按钮上的文字是当前模式。打开页面时是白天：顶栏、侧栏、图例和弹窗都是白底浅灰，按钮写着「白天模式」。点一下后这些面板变成深色，按钮改成「夜间模式」。再点「夜间模式」回到浅色，按钮又写回「白天模式」。价格数字仍用靛蓝、绿色、天蓝和玫红区分。网格上的价格标签在白天是白底深字。地图底图本身不跟着翻转。选择会记在浏览器里，下次打开仍是上次的模式。1.31 会清掉旧版本自动记下的夜间默认值，所以升级后第一次打开是白天。
 
 **分区筛选。** 顶栏下拉菜单可以只看某一个走廊：Santa Barbara（10 格）、Ventura / 101 走廊（10 格）、LA 西区与海滨（11 格）、圣费尔南多谷（10 格）、LA 中心城区（7 格）、圣盖博谷（14 格）、南湾（8 格）、北橙县 / 尔湾周边（8 格）。选中后地图飞到该走廊中心并放大到 10 级。选回「全部走廊区域」则回到最初的全景。
 
@@ -65,7 +65,7 @@ On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail 
 
 The active basemap button is indigo.
 
-**Day and night.** The header has a Day / Night button. The page opens in night mode: header, sidebar, legend, and popups stay dark, matching the original interface. Day mode turns those panels white and light gray, with dark text. Price figures stay indigo, green, sky, and rose so they can still be told apart. Cell price tags become white chips with dark type. The map basemap itself does not invert. Choosing Night returns to the dark interface. The choice is stored in the browser and kept on the next visit.
+**Day and night.** The header button names the mode currently on screen. The page opens in day mode: header, sidebar, legend, and popups are white and light gray, and the button reads 「白天模式」. One click turns those panels dark and changes the button to 「夜间模式」. Clicking again returns to the light interface and 「白天模式」. Price figures stay indigo, green, sky, and rose so they can still be told apart. Cell price tags in day mode are white chips with dark type. The map basemap itself does not invert. The choice is stored in the browser and kept on the next visit. Version 1.31 clears the night default that older versions saved automatically, so the first open after this update is day mode.
 
 **Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (10), LA Westside and coast (11), San Fernando Valley (10), Central LA (7), San Gabriel Valley (14), South Bay (8), or northern Orange County / Irvine (8). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
 
@@ -91,7 +91,7 @@ The active basemap button is indigo.
 
 | 文件 | 作用 |
 |---|---|
-| `index.html` | 页面骨架。顶栏放指标按钮、白天/夜间切换、走廊筛选、中位价滑杆和搜索框；中间是地图、底图开关和图例；右侧是详情和对比表。样式用 Tailwind CDN，地图用 Leaflet 1.9.4。标题、页眉徽章和 `application-version` 都写着当前版本 `1.3`。项目名称是 LA Area Housing Map。 |
+| `index.html` | 页面骨架。顶栏放指标按钮、白天/夜间切换、走廊筛选、中位价滑杆和搜索框；中间是地图、底图开关和图例；右侧是详情和对比表。样式用 Tailwind CDN，地图用 Leaflet 1.9.4。标题、页眉徽章和 `application-version` 都写着当前版本 `1.31`。项目名称是 LA Area Housing Map。 |
 | `data.js` | 声明 `HOUSING_GRID_DATA`，共 78 条。每条有 `id`、`name`、`region`、中心点 `lat`/`lng`、半宽 `dLat`/`dLng`、`median`、`avg`、`min`、`max`、`sales`、`ppsf` 和 `desc`。改价格或加网格只需要改这个文件。 |
 | `app.js` | 地图初始化、四套免费瓦片、格子绘制、筛选、点选详情、对比表，以及白天/夜间切换。`createBasemap()` 按按钮创建单层或多层瓦片。深色底图是深灰底加标注层。 |
 | `start_windows.bat` | Windows 启动脚本。有 Python 时在 8080 端口开本地服务并打开浏览器；没有 Python 时直接打开 `index.html`。 |
@@ -105,7 +105,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `1.3`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `1.31`. The project name is LA Area Housing Map. |
 | `data.js` | Declares `HOUSING_GRID_DATA`, 78 records. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, and `desc`. Price edits and new cells belong in this file. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it opens `index.html` directly. |
@@ -120,6 +120,12 @@ This is a static site. There is no build step and no backend. The browser loads 
 以后若发生更新，在本节最上方追加新版本，不要另开一份日志。同时把 `index.html` 的版本号改成新版本：`<title>`、页眉 `vX.Y` 徽章、`<meta name="application-version">`。三者必须相同。
 
 When the project changes again, add the new version at the top of this section. Do not start a second log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match.
+
+### 1.31 — 2026-10-31
+
+**中文。** 修正白天 / 夜间颠倒。页面默认改为浅色，按钮文字改成当前模式：浅色时写「白天模式」，深色时写「夜间模式」。点「白天模式」进入深色并改显示「夜间模式」；再点一次回到浅色。1.31 第一次打开时清掉旧版本写在 `la-housing-theme` 里的夜间记录，避免刷新后仍停在深色。之后的选择仍记在同一个键里。
+
+**English.** Fixed the reversed day and night modes. The page now opens light, and the button names the current mode: 「白天模式」 on the light theme and 「夜间模式」 on the dark theme. Clicking 「白天模式」 switches to dark and relabels the button 「夜间模式」; clicking again returns to light. The first open of 1.31 clears the night value older versions stored in `la-housing-theme`, so a refresh does not stay dark. Later choices are still stored under that same key.
 
 ### 1.3 — 2026-10-31
 

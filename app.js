@@ -280,9 +280,9 @@ function applyTheme(theme) {
   const isDay = theme === 'day';
   document.documentElement.setAttribute('data-theme', isDay ? 'day' : 'night');
   const btn = document.getElementById('theme-toggle');
-  btn.setAttribute('aria-pressed', isDay ? 'true' : 'false');
-  document.getElementById('theme-toggle-icon').textContent = isDay ? '☾' : '☀';
-  document.getElementById('theme-toggle-label').textContent = isDay ? '夜间模式' : '白天模式';
+  btn.setAttribute('aria-pressed', isDay ? 'false' : 'true');
+  document.getElementById('theme-toggle-icon').textContent = isDay ? '☀' : '☾';
+  document.getElementById('theme-toggle-label').textContent = isDay ? '白天模式' : '夜间模式';
   try { localStorage.setItem('la-housing-theme', isDay ? 'day' : 'night'); } catch (e) {}
 }
 

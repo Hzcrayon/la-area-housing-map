@@ -1,12 +1,12 @@
 # LA Area Housing Map
 
-LA 周边住房成交价格交互地图，当前版本 **1.3**。
+LA 周边住房成交价格交互地图，当前版本 **1.31**。
 
 地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到北橙县，共 78 个网格。功能、数据字段和各版本改动见 `DEVELOPER_LOG.md`。
 
 ## 项目文件
 
-- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `1.3`
+- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `1.31`
 - `data.js`: 78 个网格的成交数据（可在里面修改或扩充）
 - `app.js`: 地图交互、四维指标热力渲染、免 API Key 底图切换
 - `start_windows.bat`: Windows 一键启动
