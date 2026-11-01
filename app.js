@@ -526,7 +526,7 @@ document.getElementById('region-filter').addEventListener('change', (e) => {
 
 const PRICE_CAPS = {
   median: { slider: 'budget-slider', label: 'budget-label', input: 'budget-cap-input', max: 6000000, editable: true },
-  avg: { slider: 'avg-cap-slider', label: 'avg-cap-label', input: null, max: 10000000, editable: false },
+  avg: { slider: 'avg-cap-slider', label: 'avg-cap-label', input: 'avg-cap-input', max: 10000000, editable: true },
   min: { slider: 'min-cap-slider', label: 'min-cap-label', input: 'min-cap-input', max: 3000000, editable: true },
   max: { slider: 'max-cap-slider', label: 'max-cap-label', input: 'max-cap-input', max: 20000000, editable: true }
 };
@@ -659,7 +659,7 @@ document.querySelectorAll('.price-cap').forEach((slider) => {
   });
 });
 
-['median', 'min', 'max'].forEach((field) => {
+['median', 'avg', 'min', 'max'].forEach((field) => {
   const spec = PRICE_CAPS[field];
   document.getElementById(spec.label).addEventListener('click', () => openCapEditor(field));
   const input = document.getElementById(spec.input);
