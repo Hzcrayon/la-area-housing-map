@@ -3,8 +3,8 @@
 **项目：** LA Area Housing Map  
 **中文名：** LA 周边住房地图
 
-**当前版本：** V2.0-东南洛杉矶补点  
-**页面入口：** `index.html`（标题、页眉徽章与 `<meta name="application-version">` 都是 `2.0`）  
+**当前版本：** V2.1-原有区域改为真实成交  
+**页面入口：** `index.html`（标题、页眉徽章与 `<meta name="application-version">` 都是 `2.1`）  
 **本文件：** `DEVELOPER_LOG.zh.md`  
 **英文日志：** `DEVELOPER_LOG.en.md`
 
@@ -53,8 +53,8 @@
 
 | 文件 | 作用 |
 |---|---|
-| `index.html` | 页面骨架。顶栏放指标按钮、白天/夜间切换、走廊筛选、中位价滑杆和搜索框；中间是地图、底图开关和图例；右侧是详情和对比表。样式用 Tailwind CDN，地图用 Leaflet 1.9.4。标题、页眉徽章和 `application-version` 都写着当前版本 `2.0`。项目名称是 LA Area Housing Map。 |
-| `data.js` | 声明 `HOUSING_GRID_DATA`，共 113 条。每条有 `id`、`name`、`region`、中心点 `lat`/`lng`、半宽 `dLat`/`dLng`、`median`、`avg`、`min`、`max`、`sales`、`ppsf` 和 `desc`。改价格或加网格只需要改这个文件。V2.0 的 35 条东南洛杉矶记录来源写在第 3 节。 |
+| `index.html` | 页面骨架。顶栏放指标按钮、白天/夜间切换、走廊筛选、中位价滑杆和搜索框；中间是地图、底图开关和图例；右侧是详情和对比表。样式用 Tailwind CDN，地图用 Leaflet 1.9.4。标题、页眉徽章和 `application-version` 都写着当前版本 `2.1`。项目名称是 LA Area Housing Map。 |
+| `data.js` | 声明 `HOUSING_GRID_DATA`，共 113 条。每条有 `id`、`name`、`region`、中心点 `lat`/`lng`、半宽 `dLat`/`dLng`、`median`、`avg`、`min`、`max`、`sales`、`ppsf`、`url` 和 `desc`。`url` 是该格对应的 Redfin 地区页。 |
 | `app.js` | 地图初始化、四套免费瓦片、格子绘制、筛选、点选详情、对比表，以及白天/夜间切换。`createBasemap()` 按按钮创建单层或多层瓦片。深色底图是深灰底加标注层。 |
 | `start_windows.bat` | Windows 启动脚本。有 Python 时在 8080 端口开本地服务并打开浏览器；没有 Python 时直接打开 `index.html`。 |
 | `start_mac.command` | macOS / Linux 启动脚本。有 `python3` 时同样使用 8080 端口；否则直接打开 `index.html`。 |
@@ -67,6 +67,18 @@
 ## 3. 版本更新记录
 
 以后若发生更新，在本节最上方追加新版本，标题写成 `V版本号-名称`。不要只用日期当标题，也不要另开第三份日志。同时把 `index.html` 的版本号改成新版本：`<title>`、页眉 `vX.Y` 徽章、`<meta name="application-version">`。三者必须相同。英文日志里用同一个版本号，另起一个英文名称。
+
+### V2.1-原有区域改为真实成交
+
+**日期：** 2026-10-31
+
+V2.0 之前的 78 个格子用的是近似模拟价，这一版全部换成 Redfin 的真实成交。V2.0 那 35 个东南洛杉矶邮编格子的数字没有重算。
+
+每个格子新增 `url`。点地图格子后，弹窗里的地名和右侧「在 Redfin 打开该地区」都会在新标签打开对应的 Redfin 城市、社区或邮编页。
+
+原有格子的中位价和每平方英尺价格，取 Redfin 住房市场页公布的最近一个月（多数是 2026 年 9 月，小区域可能更早）。成交量是该页最近三个公布月的套数相加。平均价、最低价、最高价来自同一地区页「近 3 个月已成交」列表里返回的成交，低于 5 万美元的记录去掉。这份列表经常短于季度套数。如果返回太少，或高低价包不住公布中位价，平均价和高低价就留空，页面显示「—」，不再用手填数字补上。Ellwood、Newbury Park、Studio City 没有公布月度中位价，中位价改用返回成交的中位数，并在说明里写明。
+
+一个格子如果原来跨了两个地方，链接和数字只对上其中一个 Redfin 地区，说明文字里写的是那个地区的名字。例如 Walnut & Diamond Bar 用的是 Walnut，Torrance North & Gardena 用的是 North Torrance，Hermosa & Redondo 用的是 Hermosa Beach。
 
 ### V2.0-东南洛杉矶补点
 

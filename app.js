@@ -12,10 +12,12 @@ const metricLabels = {
 };
 
 function formatUSD(num) {
+  if (num == null || !isFinite(num)) return '—';
   return '$' + num.toLocaleString('en-US');
 }
 
 function formatShortUSD(num) {
+  if (num == null || !isFinite(num)) return '—';
   if (num >= 1000000) {
     return '$' + (num / 1000000).toFixed(2).replace(/\.00$/, '') + 'M';
   }
@@ -23,6 +25,7 @@ function formatShortUSD(num) {
 }
 
 function getHeatColor(val) {
+  if (val == null || !isFinite(val)) return '#94a3b8';
   if (val < 900000) return '#22c55e';      // 翠绿 < $900K
   if (val < 1400000) return '#eab308';     // 金黄 $900K - $1.4M
   if (val < 2200000) return '#f97316';     // 橙色 $1.4M - $2.2M
@@ -120,13 +123,14 @@ function renderGrid() {
     const popupHTML = `
       <div class="p-1 min-w-[230px]">
         <div class="text-[10px] text-indigo-400 font-semibold">${zone.region} · ${zone.id}</div>
-        <div class="text-sm font-bold text-white mb-2">${zone.name}</div>
+        <a href="${zone.url}" target="_blank" rel="noopener noreferrer" class="block text-sm font-bold text-white underline mb-2">${zone.name}</a>
         <div class="space-y-1 text-xs font-mono">
           <div class="flex justify-between"><span class="text-slate-400">(a) 成交中位价:</span><span class="text-indigo-300 font-bold">${formatUSD(zone.median)}</span></div>
           <div class="flex justify-between"><span class="text-slate-400">(b) 成交平均值:</span><span class="text-emerald-300 font-bold">${formatUSD(zone.avg)}</span></div>
           <div class="flex justify-between"><span class="text-slate-400">(c) 成交最低价:</span><span class="text-sky-300 font-bold">${formatUSD(zone.min)}</span></div>
           <div class="flex justify-between"><span class="text-slate-400">(d) 成交最高价:</span><span class="text-rose-300 font-bold">${formatUSD(zone.max)}</span></div>
         </div>
+        <a href="${zone.url}" target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-xs font-semibold text-indigo-300 underline">在 Redfin 打开该地区</a>
       </div>
     `;
 
@@ -165,6 +169,14 @@ function selectZone(zone) {
   document.getElementById('detail-region').textContent = `${zone.region} · 网格编号 ${zone.id}`;
   document.getElementById('detail-name').textContent = zone.name;
   document.getElementById('detail-desc').textContent = zone.desc;
+  const redfinLink = document.getElementById('redfin-link');
+  if (zone.url) {
+    redfinLink.href = zone.url;
+    redfinLink.classList.remove('hidden');
+  } else {
+    redfinLink.href = '#';
+    redfinLink.classList.add('hidden');
+  }
 
   document.getElementById('val-median').textContent = formatUSD(zone.median);
   document.getElementById('val-avg').textContent = formatUSD(zone.avg);
@@ -175,17 +187,25 @@ function selectZone(zone) {
   document.getElementById('val-ppsf').textContent = `$${zone.ppsf} /sqft`;
   document.getElementById('val-code').textContent = zone.id;
 
-  const span = Math.max(zone.max - zone.min, 1);
-  const medPct = Math.min(95, Math.max(5, ((zone.median - zone.min) / span) * 100));
-  const avgPct = Math.min(95, Math.max(5, ((zone.avg - zone.min) / span) * 100));
-  document.getElementById('marker-median').style.left = `${medPct}%`;
-  document.getElementById('marker-avg').style.left = `${avgPct}%`;
-  document.getElementById('bar-min-lbl').textContent = `Min: ${formatShortUSD(zone.min)}`;
-  document.getElementById('bar-max-lbl').textContent = `Max: ${formatShortUSD(zone.max)}`;
-
-  const diffPct = ((zone.avg - zone.median) / zone.median) * 100;
-  const diffSign = diffPct >= 0 ? '+' : '';
-  document.getElementById('span-ratio').textContent = `均值较中位 ${diffSign}${diffPct.toFixed(1)}%`;
+  const hasRange = zone.min != null && zone.max != null && zone.avg != null && zone.max > zone.min;
+  document.getElementById('marker-median').style.display = hasRange ? '' : 'none';
+  document.getElementById('marker-avg').style.display = hasRange ? '' : 'none';
+  if (hasRange) {
+    const span = zone.max - zone.min;
+    const medPct = Math.min(95, Math.max(5, ((zone.median - zone.min) / span) * 100));
+    const avgPct = Math.min(95, Math.max(5, ((zone.avg - zone.min) / span) * 100));
+    document.getElementById('marker-median').style.left = `${medPct}%`;
+    document.getElementById('marker-avg').style.left = `${avgPct}%`;
+    document.getElementById('bar-min-lbl').textContent = `Min: ${formatShortUSD(zone.min)}`;
+    document.getElementById('bar-max-lbl').textContent = `Max: ${formatShortUSD(zone.max)}`;
+    const diffPct = ((zone.avg - zone.median) / zone.median) * 100;
+    const diffSign = diffPct >= 0 ? '+' : '';
+    document.getElementById('span-ratio').textContent = `均值较中位 ${diffSign}${diffPct.toFixed(1)}%`;
+  } else {
+    document.getElementById('bar-min-lbl').textContent = 'Min: —';
+    document.getElementById('bar-max-lbl').textContent = 'Max: —';
+    document.getElementById('span-ratio').textContent = '近90天成交列表不足';
+  }
 
   const btn = document.getElementById('add-compare-btn');
   btn.disabled = false;

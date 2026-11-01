@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V2.0-Southeast LA cells  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.0`)  
+**Current version:** V2.1-Original cells use Redfin sales  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.1`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -53,8 +53,8 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.0`. The project name is LA Area Housing Map. |
-| `data.js` | Declares `HOUSING_GRID_DATA`, 113 records. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, and `desc`. Price edits and new cells belong in this file. Sources for the 35 V2.0 southeast Los Angeles records are in section 3. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.1`. The project name is LA Area Housing Map. |
+| `data.js` | Declares `HOUSING_GRID_DATA`, 113 records. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `url` is that cell’s Redfin area page. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it opens `index.html` directly. |
 | `start_mac.command` | macOS / Linux launcher. With `python3` it also uses port 8080. Otherwise it opens `index.html` directly. |
@@ -67,6 +67,18 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V2.1-Original cells use Redfin sales
+
+**Date:** 2026-10-31
+
+The 78 cells from before V2.0 used approximate simulated prices. This version replaces those prices with Redfin closed-sale figures. The 35 southeast Los Angeles ZIP cells added in V2.0 were not recalculated.
+
+Every cell now has a `url`. After a map cell is clicked, the place name in the popup and the sidebar control 「在 Redfin 打开该地区」 open that Redfin city, neighborhood, or ZIP page in a new tab.
+
+For the original cells, the median and the price per square foot are the latest month Redfin publishes on the housing-market page (September 2026 for most areas, earlier for some small ones). `sales` is the sum of the three latest published monthly counts. Average, low, and high come from the closed sales that area page returns for the past three months, after dropping prices under $50,000. That list is often shorter than the quarterly count. When too few sales come back, or when the low and high do not contain the published median, average, low, and high are left empty and the page shows an em dash instead of a filled-in estimate. Ellwood, Newbury Park, and Studio City do not publish a monthly median, so the median is the median of the returned sales, and the cell note says so.
+
+Where an old cell covered two places, the link and the figures follow one Redfin area, and the note names that area. Walnut & Diamond Bar uses Walnut. Torrance North & Gardena uses North Torrance. Hermosa & Redondo uses Hermosa Beach.
 
 ### V2.0-Southeast LA cells
 
