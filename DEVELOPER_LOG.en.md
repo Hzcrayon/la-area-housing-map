@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V3.1-Area introductions  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.1`)  
+**Current version:** V3.2-Errands, safety, and drive time  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.2`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -33,7 +33,11 @@ The active basemap button is indigo.
 
 **Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (10), LA Westside and coast (13), Southwest LA (11), Beverly Hills (3), Culver City (2), Inglewood (5), San Fernando Valley (35), Burbank (5), Glendale (9), Pasadena (6), Altadena (1), Central LA (17), Downtown LA (6), USC (6), Southeast LA / Gateway Cities (38), San Gabriel Valley (32), South Bay (12), Torrance (5), Long Beach (11), Cerritos (1), Cypress (1), Buena Park (2), Costa Mesa (2), Tustin (2), Yorba Linda (2), Newport Beach (3), Fullerton (4), Brea (2), Anaheim (7), Garden Grove (5), Santa Ana (6), Huntington Beach (4), Irvine (8), Pomona (3), Ontario (3), Fontana (3), San Bernardino (7), Riverside (7), Moreno Valley (4), Corona (5), or the Inland Empire interior (13). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
 
-**Median cap.** The slider runs from $600K to $6M in $100K steps. The right end is labeled unlimited and keeps every cell. A lower cap hides cells whose median is above that cap.
+**Median cap.** The slider runs from $200K to $6M in $50K steps. The right end is labeled unlimited and keeps every cell. A lower cap hides cells whose median is above that cap.
+
+**Safety tiers.** The header can filter five relative tiers: 1 very settled, 2 fairly settled, 3 typical, 4 use caution, and 5 high pressure. It can also keep only tiers 1–2, or 1–3. The tier is a reading of years of news plus publicly reported police patterns. It is not an official ranking, and it does not describe every block.
+
+**Drive time to USC.** The header slider runs from within 10 minutes to unlimited at the right end (about two hours and beyond stay visible). The time is a typical daytime drive with a car, estimated from distance and the main roads. The evening peak is usually longer. It is not a live navigation result.
 
 **Search.** Typing part of a city name, neighborhood, or cell id, such as `Arcadia` or `SG09`, hides cells that do not match. Matching ignores case and checks both the name and the id.
 
@@ -43,7 +47,7 @@ The active basemap button is indigo.
 
 **Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
 
-**Detail panel.** Under the place name is an introduction: what the area is like, a rough population, the kind of neighborhood, and a landmark, campus, beach, or old town. Below that are the four price cards, the bar from low to high, and the trailing-three-month sales, price per square foot, and cell id. A small gray note under those figures restates the median, price per square foot, sales count, average, low, and high, and says the figures come from Redfin.
+**Detail panel.** Under the place name is an introduction: what the area is like, a rough population, the kind of neighborhood, and a landmark, campus, beach, or old town. Next come errands (a small market, or a larger chain such as Costco, Walmart, Ralphs, Target, Trader Joe's, or 99 Ranch, plus CVS and coffee), the safety tier, and the approximate drive to USC. Below that are the four price cards, the bar from low to high, and the trailing-three-month sales, price per square foot, and cell id. A small gray note under those figures restates the sale numbers.
 
 **Comparison list.** 「加入下方候选对比列表」 adds the current area to the table at the lower right: name, median, average, and low-to-high range. The same cell is not added twice. 「清空」 clears the table. The add button stays disabled until a cell is selected.
 
@@ -55,7 +59,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.1`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.2`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 331 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -70,6 +74,16 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V3.2-Errands, safety, and drive time
+
+**Date:** 2026-11-01
+
+Each area note now has three more parts. Errands say whether groceries are a small market or a larger chain such as Costco, Walmart, Ralphs, Target, Trader Joe's, or 99 Ranch, and whether CVS and coffee are nearby. Pharmacies are written as CVS.
+
+Safety is five tiers. The header can show one tier, tiers 1–2, or tiers 1–3. Tier 1 is very settled and tier 5 is high pressure. The grade reads years of news and publicly reported police patterns. The panel says it is not an official ranking.
+
+Drive time to USC assumes a car and a typical daytime trip. The slider’s left end is within 10 minutes and the right end is unlimited. The median cap now starts at $200K and moves in $50K steps. The right end is still unlimited. The sale figures are unchanged.
 
 ### V3.1-Area introductions
 

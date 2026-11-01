@@ -6,6 +6,14 @@ let showLabels = true;
 let selectedZone = null;
 const compareList = [];
 
+const SAFETY_TIERS = {
+  1: ['1 非常安定', '公开报道里的暴力犯罪较少，多为安静住宅区或小城。'],
+  2: ['2 相对安定', '日常更常见的是财物类案件，暴力犯罪报道不多。'],
+  3: ['3 中等', '和洛杉矶盆地的一般城区接近，需要普通的城市防范。'],
+  4: ['4 需要留意', '财物犯罪和街头案件的报道明显更多，街区之间差别大。'],
+  5: ['5 治安压力大', '暴力犯罪相关报道长期较多，看房时要具体到街区。']
+};
+
 const metricLabels = {
   median: '(a) 成交中位价',
   avg: '(b) 成交平均值',
@@ -129,11 +137,19 @@ function renderGrid() {
 
   const regionVal = document.getElementById('region-filter').value;
   const maxBudget = parseInt(document.getElementById('budget-slider').value, 10);
+  const safetyVal = document.getElementById('safety-filter').value;
+  const uscMax = parseInt(document.getElementById('usc-slider').value, 10);
   const keyword = document.getElementById('search-input').value.trim().toLowerCase();
 
   HOUSING_GRID_DATA.forEach(zone => {
     if (regionVal !== 'ALL' && zone.region !== regionVal) return;
     if (maxBudget < 6000000 && zone.median > maxBudget) return;
+    if (safetyVal !== 'ALL') {
+      if (safetyVal.indexOf('LTE') === 0) {
+        if (zone.safety > parseInt(safetyVal.slice(3), 10)) return;
+      } else if (zone.safety !== parseInt(safetyVal, 10)) return;
+    }
+    if (uscMax < 120 && zone.uscMin > uscMax) return;
     if (keyword && !zone.name.toLowerCase().includes(keyword) && !zone.id.toLowerCase().includes(keyword)) return;
 
     const metricValue = zone[currentMetric];
@@ -209,6 +225,16 @@ function selectZone(zone) {
   document.getElementById('detail-region').textContent = `${zone.region} · 网格编号 ${zone.id}`;
   document.getElementById('detail-name').textContent = zone.name;
   document.getElementById('detail-desc').textContent = zone.desc;
+  document.getElementById('detail-shops').textContent = zone.shops || '';
+  const tier = SAFETY_TIERS[zone.safety] || ['—', ''];
+  document.getElementById('detail-safety').textContent = tier[0];
+  document.getElementById('detail-safety-note').textContent = tier[1]
+    ? tier[1] + ' 这是根据多年新闻和各地警方公开的案件分布做的相对分级，不是官方排名。'
+    : '';
+  const driveText = zone.uscMin <= 10
+    ? '一般白天开车大约 10 分钟以内。'
+    : `一般白天开车大约 ${zone.uscMin} 分钟。`;
+  document.getElementById('detail-usc').textContent = driveText + ' 晚高峰往往会更久。这是大概车程，不是导航的实时结果。';
   document.getElementById('housing-note').textContent = housingNote(zone);
   const redfinLink = document.getElementById('redfin-link');
   if (zone.url) {
@@ -298,6 +324,14 @@ document.getElementById('region-filter').addEventListener('change', (e) => {
 document.getElementById('budget-slider').addEventListener('input', (e) => {
   const val = parseInt(e.target.value, 10);
   document.getElementById('budget-label').textContent = val >= 6000000 ? '不限' : formatShortUSD(val);
+  renderGrid();
+});
+
+document.getElementById('safety-filter').addEventListener('change', () => renderGrid());
+
+document.getElementById('usc-slider').addEventListener('input', (e) => {
+  const val = parseInt(e.target.value, 10);
+  document.getElementById('usc-label').textContent = val >= 120 ? '不限' : (val <= 10 ? '10 分钟内' : val + ' 分钟内');
   renderGrid();
 });
 
