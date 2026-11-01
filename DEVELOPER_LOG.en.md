@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V3.5-Price caps and price search  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.5`)  
+**Current version:** V3.6-Price per square foot heat  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.6`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -18,7 +18,11 @@ This site shows closed-home prices from central Los Angeles out to Santa Barbara
 
 On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SG09`, ZIP 91006). The map can be panned and zoomed from level 7 through 16.
 
-**Four price metrics.** The header has four buttons: (a) median, (b) average, (c) minimum, and (d) maximum. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. All four metrics share 16 dollar bins: under $400K, then $400–500K, $500–600K, $600–700K, $700–800K, $800–900K, $900K–$1.0M, $1.0–1.2M, $1.2–1.4M, $1.4–1.6M, $1.6–1.8M, $1.8–2.2M, $2.2–2.8M, $2.8–3.6M, $3.6–5.0M, and $5.0M or more. Colors run from cyan and green through yellow, orange, and red, then into purple. A cell with no figure for that metric is gray, labeled 「无数据」 in the legend.
+**Price heat.** The header has five buttons: (a) median, (b) average, (c) minimum, (d) maximum, and (e) price per square foot. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. Chips sit in two columns. A cell with no figure for that metric is gray, labeled 「无数据」.
+
+The four sale-price metrics share 16 dollar bins: under $400K, then $400–500K, $500–600K, $600–700K, $700–800K, $800–900K, $900K–$1.0M, $1.0–1.2M, $1.2–1.4M, $1.4–1.6M, $1.6–1.8M, $1.8–2.2M, $2.2–2.8M, $2.8–3.6M, $3.6–5.0M, and $5.0M or more. Colors run from cyan and green through yellow, orange, and red, then into purple.
+
+Price per square foot uses its own 16 bins, in dollars per square foot: under $300, $300–400, $400–450, $450–500, $500–550, $550–600, $600–650, $650–700, $700–750, $750–800, $800–900, $900–1,000, $1,000–1,200, $1,200–1,500, $1,500–1,800, and $1,800 or more. Published figures mostly sit between $400 and $800, so that band steps by $50. The low is about $205 and the high is about $1,950. The color order matches the sale-price heat. This is the single per-square-foot figure Redfin already published and the database already stores. It is not split into a median, average, low, and high of its own.
 
 **Basemap switcher.** Four free basemaps sit at the map’s upper right. None of them needs an API key:
 
@@ -40,7 +44,7 @@ The active basemap button is indigo.
 - Low: $50K to $3M, in $50K steps. Published lows run from $50K to about $2.86M.
 - High: $500K to $20M, in $250K steps. Published highs start around $695K, most sit in the low millions, and a few estate sales reach above $50M, so the slider stops at $20M and anything higher stays available at the unlimited end.
 
-**Price search.** A separate control can test the median, average, low, or high: less than, greater than, or between two amounts. Less than and greater than do not include an equal value. Between includes both ends, and the two amounts are ordered automatically if they are entered backwards. An empty amount is ignored. Choosing unlimited turns this search off. It applies together with the four caps. A cell with no published figure for the chosen metric does not pass a numeric condition.
+**Price search.** A separate control can test the median, average, low, high, or price per square foot: less than, greater than, or between two amounts. Less than and greater than do not include an equal value. Between includes both ends, and the two amounts are ordered automatically if they are entered backwards. An empty amount is ignored. Choosing unlimited turns this search off. It applies together with the four sale-price caps. A cell with no published figure for the chosen metric does not pass a numeric condition. When the metric is price per square foot, the boxes are filled in dollars per square foot.
 
 **Safety tiers.** The header can filter five relative tiers: 1 very settled, 2 fairly settled, 3 typical, 4 use caution, and 5 high pressure. It can also keep only tiers 1–2, or 1–3. The tier is a reading of years of news plus publicly reported police patterns. It is not an official ranking, and it does not describe every block.
 
@@ -52,7 +56,7 @@ The active basemap button is indigo.
 
 **Hover, select, and popup.** Hovering a cell thickens its outline and deepens the fill. Clicking it loads that area in the side panel and turns the outline white. Clicking again opens a popup with all four prices.
 
-**Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). The column’s left edge can be dragged. On a wide screen the narrowest open width is about 300 pixels and the widest is about 560 pixels, and never more than half the window. Dragging it narrower than the minimum closes it. On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
+**Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). The column’s left edge can be dragged. On a wide screen the narrowest open width is about 300 pixels and the widest is about 560 pixels, and never more than half the window. Dragging stops at the minimum width and does not close the column. Only 「收起说明」 hides it. On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
 
 **Detail panel.** Under the place name is an introduction: what the area is like, a rough population, the kind of neighborhood, and a landmark, campus, beach, or old town. Next come errands (a small market, or a larger chain such as Costco, Walmart, Ralphs, Target, Trader Joe's, or 99 Ranch, plus CVS and coffee), the safety tier, and the approximate drive to USC. Below that are the four price cards, the bar from low to high (green at the low end, red at the high end), and the trailing-three-month sales, price per square foot, and cell id. A small gray note under those figures restates the sale numbers.
 
@@ -66,7 +70,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.5`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.6`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, `desc`, `shops`, `safety`, and `uscMin`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -81,6 +85,16 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V3.6-Price per square foot heat
+
+**Date:** 2026-11-01
+
+The heat map gained a second scale: price per square foot. It uses the `ppsf` value already stored on each record. No new pages were fetched. 486 cells have the figure and 20 do not; the missing ones stay gray. The bins follow those numbers. From $400 to $800 the step is $50, and the ends are wider, for 16 bins in the same legend layout as the sale-price heat. Cell tags in this mode show a whole dollar amount rather than a shortened total such as “$1K”.
+
+The price search can use price per square foot with less than, greater than, or between. The four sale-price buttons still switch only the total-price heat. Price per square foot is not split into four statistics.
+
+The notes column now stops at its minimum width instead of closing. Hiding it still takes the 「收起说明」 button.
 
 ### V3.5-Price caps and price search
 

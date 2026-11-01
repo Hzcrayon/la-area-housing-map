@@ -1,4 +1,4 @@
-// LA Area Housing Map：Leaflet 免费底图切换 + 506个网格多边形渲染 + 四维参数动态联动
+// LA Area Housing Map：Leaflet 免费底图切换 + 506个网格多边形渲染 + 总价与每平方英尺热力
 // 成交数据不写在这里，启动时从 housing_data.json 读入。
 let HOUSING_GRID_DATA = [];
 let currentMetric = 'median';
@@ -18,7 +18,8 @@ const metricLabels = {
   median: '(a) 成交中位价',
   avg: '(b) 成交平均值',
   min: '(c) 成交最低价',
-  max: '(d) 成交最高价'
+  max: '(d) 成交最高价',
+  ppsf: '(e) 每平方英尺均价'
 };
 
 function formatUSD(num) {
@@ -53,19 +54,49 @@ const HEAT_STOPS = [
   { max: 5000000, color: '#6d28d9', ink: '#ffffff', label: '$3.6–5.0M' },
   { max: Infinity, color: '#4c1d95', ink: '#ffffff', label: '≥$5.0M' }
 ];
+// 每平方英尺均价大多在 400 到 800 美元，所以这一段按 50 美元一档；两端再放宽。
+const PPSF_STOPS = [
+  { max: 300, color: '#075985', ink: '#ffffff', label: '<$300' },
+  { max: 400, color: '#0891b2', ink: '#ffffff', label: '$300–400' },
+  { max: 450, color: '#0e7490', ink: '#ffffff', label: '$400–450' },
+  { max: 500, color: '#0f766e', ink: '#ffffff', label: '$450–500' },
+  { max: 550, color: '#059669', ink: '#ffffff', label: '$500–550' },
+  { max: 600, color: '#3f6212', ink: '#ffffff', label: '$550–600' },
+  { max: 650, color: '#4d7c0f', ink: '#ffffff', label: '$600–650' },
+  { max: 700, color: '#65a30d', ink: '#ffffff', label: '$650–700' },
+  { max: 750, color: '#84cc16', ink: '#1a2e05', label: '$700–750' },
+  { max: 800, color: '#eab308', ink: '#1c1917', label: '$750–800' },
+  { max: 900, color: '#f59e0b', ink: '#1c1917', label: '$800–900' },
+  { max: 1000, color: '#f97316', ink: '#1c1917', label: '$900–1,000' },
+  { max: 1200, color: '#dc2626', ink: '#ffffff', label: '$1,000–1,200' },
+  { max: 1500, color: '#e11d48', ink: '#ffffff', label: '$1,200–1,500' },
+  { max: 1800, color: '#9333ea', ink: '#ffffff', label: '$1,500–1,800' },
+  { max: Infinity, color: '#4c1d95', ink: '#ffffff', label: '≥$1,800' }
+];
 const HEAT_EMPTY = { color: '#94a3b8', ink: '#0f172a', label: '无数据' };
+
+function activeHeatStops() {
+  return currentMetric === 'ppsf' ? PPSF_STOPS : HEAT_STOPS;
+}
 
 function getHeatColor(val) {
   if (val == null || !isFinite(val)) return HEAT_EMPTY.color;
-  for (let i = 0; i < HEAT_STOPS.length; i += 1) {
-    if (val < HEAT_STOPS[i].max) return HEAT_STOPS[i].color;
+  const stops = activeHeatStops();
+  for (let i = 0; i < stops.length; i += 1) {
+    if (val < stops[i].max) return stops[i].color;
   }
-  return HEAT_STOPS[HEAT_STOPS.length - 1].color;
+  return stops[stops.length - 1].color;
+}
+
+function formatMetricShort(val) {
+  if (val == null || !isFinite(val)) return '—';
+  if (currentMetric === 'ppsf') return '$' + Math.round(val);
+  return formatShortUSD(val);
 }
 
 function renderLegend() {
   const scale = document.getElementById('legend-scale');
-  const chips = HEAT_STOPS.map(stop => (
+  const chips = activeHeatStops().map(stop => (
     `<div class="legend-swatch" style="background:${stop.color};color:${stop.ink}">${stop.label}</div>`
   ));
   chips.push(`<div class="legend-swatch span-2" style="background:${HEAT_EMPTY.color};color:${HEAT_EMPTY.ink}">${HEAT_EMPTY.label}</div>`);
@@ -175,6 +206,7 @@ function renderGrid() {
           <div class="flex justify-between"><span class="text-slate-400">(b) 成交平均值:</span><span class="text-emerald-300 font-bold">${formatUSD(zone.avg)}</span></div>
           <div class="flex justify-between"><span class="text-slate-400">(c) 成交最低价:</span><span class="text-sky-300 font-bold">${formatUSD(zone.min)}</span></div>
           <div class="flex justify-between"><span class="text-slate-400">(d) 成交最高价:</span><span class="text-rose-300 font-bold">${formatUSD(zone.max)}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">(e) 每平方英尺:</span><span class="text-amber-300 font-bold">${zone.ppsf == null ? '—' : '$' + zone.ppsf}</span></div>
         </div>
         <a href="${zone.url}" target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-xs font-semibold text-indigo-300 underline">在 Redfin 打开该地区</a>
       </div>
@@ -199,7 +231,7 @@ function renderGrid() {
       const labelMarker = L.marker([zone.lat, zone.lng], {
         icon: L.divIcon({
           className: '',
-          html: `<div class="grid-label">${formatShortUSD(metricValue)}</div>`,
+          html: `<div class="grid-label">${formatMetricShort(metricValue)}</div>`,
           iconSize: [54, 18],
           iconAnchor: [27, 9]
         }),
@@ -287,6 +319,7 @@ document.querySelectorAll('.metric-btn').forEach(btn => {
     btn.className = 'metric-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 text-white transition';
     currentMetric = btn.dataset.metric;
     document.getElementById('legend-title').textContent = `价格热力图例 ${metricLabels[currentMetric]}`;
+    renderLegend();
     renderGrid();
   });
 });
@@ -379,11 +412,18 @@ function priceQueryHides(zone) {
 
 function syncPriceQueryInputs() {
   const mode = document.getElementById('price-query-mode').value;
+  const field = document.getElementById('price-query-metric').value;
   const showA = mode === 'lt' || mode === 'gt' || mode === 'between';
   const showB = mode === 'between';
+  const perFoot = field === 'ppsf';
   document.getElementById('price-query-a').classList.toggle('hidden', !showA);
   document.getElementById('price-query-b').classList.toggle('hidden', !showB);
   document.getElementById('price-query-and').classList.toggle('hidden', !showB);
+  ['price-query-a', 'price-query-b'].forEach((id) => {
+    const input = document.getElementById(id);
+    input.step = perFoot ? '10' : '10000';
+    input.placeholder = perFoot ? '美元/平方英尺' : '金额';
+  });
 }
 
 document.querySelectorAll('.price-cap').forEach((slider) => {
@@ -545,12 +585,7 @@ panelResizer.addEventListener('pointerdown', (event) => {
   function onMove(moveEvent) {
     const limits = panelLimits();
     const next = startWidth + (startX - moveEvent.clientX);
-    if (next < limits.min) {
-      stopDrag();
-      setPanelOpen(false);
-      return;
-    }
-    applyPanelWidth(Math.min(limits.max, next));
+    applyPanelWidth(next);
     refreshMapSize();
   }
 
