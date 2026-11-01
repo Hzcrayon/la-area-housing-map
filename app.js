@@ -2,6 +2,7 @@
 // 成交数据不写在这里，启动时从 housing_data.json 读入。
 let HOUSING_GRID_DATA = [];
 let currentMetric = 'median';
+let currentSpan = 3;
 let showLabels = true;
 let selectedZone = null;
 const compareList = [];
@@ -21,6 +22,15 @@ const metricLabels = {
   max: '(d) 成交最高价',
   ppsf: '(e) 每平方英尺均价'
 };
+
+const SPAN_LABELS = { 3: '近三个月', 6: '近六个月', 9: '近九个月', 12: '近十二个月' };
+
+function spanValue(zone, field) {
+  const source = currentSpan === 3 ? zone : (zone['m' + currentSpan] || {});
+  const val = source[field];
+  if (val == null || !isFinite(val)) return null;
+  return val;
+}
 
 function formatUSD(num) {
   if (num == null || !isFinite(num)) return '—';
@@ -182,7 +192,7 @@ function renderGrid() {
     if (uscMax < 120 && zone.uscMin > uscMax) return;
     if (keyword && !zone.name.toLowerCase().includes(keyword) && !zone.id.toLowerCase().includes(keyword)) return;
 
-    const metricValue = zone[currentMetric];
+    const metricValue = spanValue(zone, currentMetric);
     const color = getHeatColor(metricValue);
 
     const bounds = [
@@ -202,11 +212,11 @@ function renderGrid() {
         <div class="text-[10px] text-indigo-400 font-semibold">${zone.region} · ${zone.id}</div>
         <a href="${zone.url}" target="_blank" rel="noopener noreferrer" class="block text-sm font-bold text-white underline mb-2">${zone.name}</a>
         <div class="space-y-1 text-xs font-mono">
-          <div class="flex justify-between"><span class="text-slate-400">(a) 成交中位价:</span><span class="text-indigo-300 font-bold">${formatUSD(zone.median)}</span></div>
-          <div class="flex justify-between"><span class="text-slate-400">(b) 成交平均值:</span><span class="text-emerald-300 font-bold">${formatUSD(zone.avg)}</span></div>
-          <div class="flex justify-between"><span class="text-slate-400">(c) 成交最低价:</span><span class="text-sky-300 font-bold">${formatUSD(zone.min)}</span></div>
-          <div class="flex justify-between"><span class="text-slate-400">(d) 成交最高价:</span><span class="text-rose-300 font-bold">${formatUSD(zone.max)}</span></div>
-          <div class="flex justify-between"><span class="text-slate-400">(e) 每平方英尺:</span><span class="text-amber-300 font-bold">${zone.ppsf == null ? '—' : '$' + zone.ppsf}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">(a) 成交中位价:</span><span class="text-indigo-300 font-bold">${formatUSD(spanValue(zone, 'median'))}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">(b) 成交平均值:</span><span class="text-emerald-300 font-bold">${formatUSD(spanValue(zone, 'avg'))}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">(c) 成交最低价:</span><span class="text-sky-300 font-bold">${formatUSD(spanValue(zone, 'min'))}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">(d) 成交最高价:</span><span class="text-rose-300 font-bold">${formatUSD(spanValue(zone, 'max'))}</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">(e) 每平方英尺:</span><span class="text-amber-300 font-bold">${spanValue(zone, 'ppsf') == null ? '—' : '$' + spanValue(zone, 'ppsf')}</span></div>
         </div>
         <a href="${zone.url}" target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-xs font-semibold text-indigo-300 underline">在 Redfin 打开该地区</a>
       </div>
@@ -243,12 +253,23 @@ function renderGrid() {
 }
 
 function housingNote(zone) {
-  const ppsfText = zone.ppsf == null ? '每平方英尺价格未公布' : `每平方英尺均价 $${zone.ppsf}`;
-  const hasRange = zone.avg != null && zone.min != null && zone.max != null;
+  const median = spanValue(zone, 'median');
+  const avg = spanValue(zone, 'avg');
+  const min = spanValue(zone, 'min');
+  const max = spanValue(zone, 'max');
+  const sales = spanValue(zone, 'sales');
+  const ppsf = spanValue(zone, 'ppsf');
+  const windowName = SPAN_LABELS[currentSpan];
+  if (median == null && avg == null && min == null && max == null && sales == null && ppsf == null) {
+    return `${windowName}的中位价、平均价、最低价、最高价、成交套数和每平方英尺均价都还没有写入。`;
+  }
+  const ppsfText = ppsf == null ? '每平方英尺价格未公布' : `每平方英尺均价 $${ppsf}`;
+  const hasRange = avg != null && min != null && max != null;
   const rangeText = hasRange
-    ? `平均价 ${formatUSD(zone.avg)}，最低价 ${formatUSD(zone.min)}，最高价 ${formatUSD(zone.max)}。平均价与高低价来自该页返回的近 90 天成交。`
-    : '近 90 天返回的成交不足以计算平均价、最低价和最高价。';
-  return `中位价 ${formatUSD(zone.median)}，${ppsfText}，近三个月成交 ${zone.sales} 套。${rangeText}中位价和每平方英尺价格来自 Redfin 公布值。`;
+    ? `平均价 ${formatUSD(avg)}，最低价 ${formatUSD(min)}，最高价 ${formatUSD(max)}。平均价与高低价来自该页返回的${windowName}成交。`
+    : `${windowName}返回的成交不足以计算平均价、最低价和最高价。`;
+  const salesText = sales == null ? '成交套数未公布' : `${windowName}成交 ${sales} 套`;
+  return `中位价 ${formatUSD(median)}，${ppsfText}，${salesText}。${rangeText}中位价和每平方英尺价格来自 Redfin 公布值。`;
 }
 
 function selectZone(zone) {
@@ -267,6 +288,7 @@ function selectZone(zone) {
     : `一般白天开车大约 ${zone.uscMin} 分钟。`;
   document.getElementById('detail-usc').textContent = driveText + ' 晚高峰往往会更久。这是大概车程，不是导航的实时结果。';
   document.getElementById('housing-note').textContent = housingNote(zone);
+  document.getElementById('sales-caption').textContent = SPAN_LABELS[currentSpan] + '成交';
   const redfinLink = document.getElementById('redfin-link');
   if (zone.url) {
     redfinLink.href = zone.url;
@@ -276,33 +298,39 @@ function selectZone(zone) {
     redfinLink.classList.add('hidden');
   }
 
-  document.getElementById('val-median').textContent = formatUSD(zone.median);
-  document.getElementById('val-avg').textContent = formatUSD(zone.avg);
-  document.getElementById('val-min').textContent = formatUSD(zone.min);
-  document.getElementById('val-max').textContent = formatUSD(zone.max);
+  const median = spanValue(zone, 'median');
+  const avg = spanValue(zone, 'avg');
+  const min = spanValue(zone, 'min');
+  const max = spanValue(zone, 'max');
+  const sales = spanValue(zone, 'sales');
+  const ppsf = spanValue(zone, 'ppsf');
+  document.getElementById('val-median').textContent = formatUSD(median);
+  document.getElementById('val-avg').textContent = formatUSD(avg);
+  document.getElementById('val-min').textContent = formatUSD(min);
+  document.getElementById('val-max').textContent = formatUSD(max);
 
-  document.getElementById('val-sales').textContent = `${zone.sales} 套`;
-  document.getElementById('val-ppsf').textContent = zone.ppsf == null ? '—' : `$${zone.ppsf} /sqft`;
+  document.getElementById('val-sales').textContent = sales == null ? '—' : `${sales} 套`;
+  document.getElementById('val-ppsf').textContent = ppsf == null ? '—' : `$${ppsf} /sqft`;
   document.getElementById('val-code').textContent = zone.id;
 
-  const hasRange = zone.min != null && zone.max != null && zone.avg != null && zone.max > zone.min;
+  const hasRange = min != null && max != null && avg != null && max > min;
   document.getElementById('marker-median').style.display = hasRange ? '' : 'none';
   document.getElementById('marker-avg').style.display = hasRange ? '' : 'none';
   if (hasRange) {
-    const span = zone.max - zone.min;
-    const medPct = Math.min(95, Math.max(5, ((zone.median - zone.min) / span) * 100));
-    const avgPct = Math.min(95, Math.max(5, ((zone.avg - zone.min) / span) * 100));
+    const span = max - min;
+    const medPct = Math.min(95, Math.max(5, ((median - min) / span) * 100));
+    const avgPct = Math.min(95, Math.max(5, ((avg - min) / span) * 100));
     document.getElementById('marker-median').style.left = `${medPct}%`;
     document.getElementById('marker-avg').style.left = `${avgPct}%`;
-    document.getElementById('bar-min-lbl').textContent = `Min: ${formatShortUSD(zone.min)}`;
-    document.getElementById('bar-max-lbl').textContent = `Max: ${formatShortUSD(zone.max)}`;
-    const diffPct = ((zone.avg - zone.median) / zone.median) * 100;
+    document.getElementById('bar-min-lbl').textContent = `Min: ${formatShortUSD(min)}`;
+    document.getElementById('bar-max-lbl').textContent = `Max: ${formatShortUSD(max)}`;
+    const diffPct = ((avg - median) / median) * 100;
     const diffSign = diffPct >= 0 ? '+' : '';
     document.getElementById('span-ratio').textContent = `均值较中位 ${diffSign}${diffPct.toFixed(1)}%`;
   } else {
     document.getElementById('bar-min-lbl').textContent = 'Min: —';
     document.getElementById('bar-max-lbl').textContent = 'Max: —';
-    document.getElementById('span-ratio').textContent = '近90天成交列表不足';
+    document.getElementById('span-ratio').textContent = currentSpan === 3 ? '近90天成交列表不足' : '这一周期还没有写入';
   }
 
   const btn = document.getElementById('add-compare-btn');
@@ -321,6 +349,19 @@ document.querySelectorAll('.metric-btn').forEach(btn => {
     document.getElementById('legend-title').textContent = `价格热力图例 ${metricLabels[currentMetric]}`;
     renderLegend();
     renderGrid();
+  });
+});
+
+document.querySelectorAll('.span-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.span-btn').forEach(b => {
+      b.className = 'span-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition';
+    });
+    btn.className = 'span-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 text-white transition';
+    currentSpan = parseInt(btn.dataset.span, 10);
+    renderGrid();
+    renderCompareTable();
+    if (selectedZone) selectZone(selectedZone);
   });
 });
 
@@ -372,8 +413,8 @@ function priceCapHides(zone) {
     const spec = PRICE_CAPS[field];
     const cap = readCap(field);
     if (cap >= spec.max) continue;
-    const price = zone[field];
-    if (price == null || !isFinite(price) || price > cap) return true;
+    const price = spanValue(zone, field);
+    if (price == null || price > cap) return true;
   }
   return false;
 }
@@ -389,7 +430,7 @@ function priceQueryHides(zone) {
   const mode = document.getElementById('price-query-mode').value;
   if (mode === 'off') return false;
   const field = document.getElementById('price-query-metric').value;
-  const price = zone[field];
+  const price = spanValue(zone, field);
   if (price == null || !isFinite(price)) return true;
   const left = readQueryBound('price-query-a');
   const right = readQueryBound('price-query-b');
@@ -485,9 +526,9 @@ function renderCompareTable() {
   tbody.innerHTML = compareList.map(z => `
     <tr class="hover:bg-slate-900">
       <td class="py-1.5 font-sans font-semibold text-white">${z.name.split(' ')[0]}</td>
-      <td class="py-1.5 text-indigo-400 font-bold">${formatShortUSD(z.median)}</td>
-      <td class="py-1.5 text-emerald-400">${formatShortUSD(z.avg)}</td>
-      <td class="py-1.5 text-slate-300">${formatShortUSD(z.min)}-${formatShortUSD(z.max)}</td>
+      <td class="py-1.5 text-indigo-400 font-bold">${formatShortUSD(spanValue(z, 'median'))}</td>
+      <td class="py-1.5 text-emerald-400">${formatShortUSD(spanValue(z, 'avg'))}</td>
+      <td class="py-1.5 text-slate-300">${formatShortUSD(spanValue(z, 'min'))}-${formatShortUSD(spanValue(z, 'max'))}</td>
     </tr>
   `).join('');
 }

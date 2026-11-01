@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V3.6-Price per square foot heat  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.6`)  
+**Current version:** V4.0-History window format  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.0`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -14,9 +14,11 @@ After every later change to features, data, or basemaps, add an entry at the top
 
 ## 1. Task and Features
 
-This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches the south Orange County coast to the southeast. It is divided into 506 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a trailing-90-day sales count, a price per square foot, and a short area note.
+This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches the south Orange County coast to the southeast. It is divided into 506 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a sales count, a price per square foot, and a short area note. Those six figures on the record itself are the trailing three months. Each record also has `m6`, `m9`, and `m12` in the same shape for six, nine, and twelve months. Those three windows are null until the numbers are filled in.
 
 On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SG09`, ZIP 91006). The map can be panned and zoomed from level 7 through 16.
+
+**History window.** Next to the metric buttons are 3 months, 6 months, 9 months, and 12 months. The heat map, cell tags, detail prices, price caps, and price search all follow the selected window. Three months uses the figures already stored on each record. Six, nine, and twelve months are empty, so those cells are gray 「无数据」 and the detail figures read 「—」. Later numbers can be filled into the same fields without another page change.
 
 **Price heat.** The header has five buttons: (a) median, (b) average, (c) minimum, (d) maximum, and (e) price per square foot. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. Chips sit in two columns. A cell with no figure for that metric is gray, labeled 「无数据」.
 
@@ -70,8 +72,8 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.6`. The project name is LA Area Housing Map. |
-| `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, `desc`, `shops`, `safety`, and `uscMin`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.0`. The project name is LA Area Housing Map. |
+| `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `m6`, `m9`, `m12`, `url`, `desc`, `shops`, `safety`, and `uscMin`. The top-level `sales` and `ppsf` are the trailing three months. `m6`, `m9`, and `m12` each hold the same six figures and are `null` until collected. `ppsf` is dollars per square foot as published by Redfin, not per square meter. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
 | `serve_local.ps1` | Local server used when Python is missing. It also uses port 8080. |
@@ -85,6 +87,14 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V4.0-History window format
+
+**Date:** 2026-11-01
+
+Each cell gained a format for six, nine, and twelve months beside the existing three-month figures. `m6`, `m9`, and `m12` each have `median`, `avg`, `min`, `max`, `sales`, and `ppsf`, matching the six numbers already stored for three months. All of those new values are null. No historical pages were fetched.
+
+The header has buttons for 3, 6, 9, and 12 months. The heat map, tags, detail prices, cap sliders, and price search follow the selected window. An unfilled window draws gray cells and 「—」 in the detail panel. The existing three-month numbers are unchanged.
 
 ### V3.6-Price per square foot heat
 
