@@ -6,6 +6,6 @@ if %errorlevel%==0 (
     start http://localhost:8080
     python -m http.server 8080
 ) else (
-    echo 未检测到 Python，正在直接用默认浏览器打开 index.html...
-    start index.html
+    echo 未检测到 Python，改用 Windows 自带方式在 8080 端口打开。
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0serve_local.ps1"
 )

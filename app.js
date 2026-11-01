@@ -1,4 +1,6 @@
 // LA Area Housing Map：Leaflet 免费底图切换 + 331个网格多边形渲染 + 四维参数动态联动
+// 成交数据不写在这里，启动时从 housing_data.json 读入。
+let HOUSING_GRID_DATA = [];
 let currentMetric = 'median';
 let showLabels = true;
 let selectedZone = null;
@@ -314,6 +316,18 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 
 applyTheme(document.documentElement.getAttribute('data-theme') === 'day' ? 'day' : 'night');
 
-// 默认选中 Arcadia 作为初始展示
-renderGrid();
-selectZone(HOUSING_GRID_DATA.find(z => z.id === 'SG09'));
+async function loadHousingData() {
+  const response = await fetch('housing_data.json');
+  if (!response.ok) throw new Error('无法读取 housing_data.json');
+  const database = await response.json();
+  HOUSING_GRID_DATA = database.areas || [];
+  renderGrid();
+  selectZone(HOUSING_GRID_DATA.find(z => z.id === 'SG09'));
+}
+
+loadHousingData().catch(() => {
+  const name = document.getElementById('detail-name');
+  const desc = document.getElementById('detail-desc');
+  if (name) name.textContent = '数据未加载';
+  if (desc) desc.textContent = '成交数据在 housing_data.json。请用 start_windows.bat 或 start_mac.command 打开。直接双击 index.html 时，浏览器不会读取旁边的 JSON 文件。';
+});

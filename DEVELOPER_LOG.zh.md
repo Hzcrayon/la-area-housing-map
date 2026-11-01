@@ -3,8 +3,8 @@
 **项目：** LA Area Housing Map  
 **中文名：** LA 周边住房地图
 
-**当前版本：** V2.8-大洛杉矶邮编补齐  
-**页面入口：** `index.html`（标题、页眉徽章与 `<meta name="application-version">` 都是 `2.8`）  
+**当前版本：** V2.9-数据分离  
+**页面入口：** `index.html`（标题、页眉徽章与 `<meta name="application-version">` 都是 `2.9`）  
 **本文件：** `DEVELOPER_LOG.zh.md`  
 **英文日志：** `DEVELOPER_LOG.en.md`
 
@@ -49,15 +49,16 @@
 
 ## 2. 代码结构说明
 
-这是一个纯静态网站，没有构建步骤，也没有后端。浏览器按顺序加载 Leaflet、`data.js`、`app.js`。
+这是一个纯静态网站，没有构建步骤，也没有后端。浏览器加载 Leaflet 和 `app.js`。`app.js` 再读取 `housing_data.json`。
 
 | 文件 | 作用 |
 |---|---|
-| `index.html` | 页面骨架。顶栏放指标按钮、白天/夜间切换、走廊筛选、中位价滑杆和搜索框；中间是地图、底图开关和图例；右侧是详情和对比表。样式用 Tailwind CDN，地图用 Leaflet 1.9.4。标题、页眉徽章和 `application-version` 都写着当前版本 `2.8`。项目名称是 LA Area Housing Map。 |
-| `data.js` | 声明 `HOUSING_GRID_DATA`，共 331 条。每条有 `id`、`name`、`region`、中心点 `lat`/`lng`、半宽 `dLat`/`dLng`、`median`、`avg`、`min`、`max`、`sales`、`ppsf`、`url` 和 `desc`。`url` 是该格对应的 Redfin 地区页。 |
+| `index.html` | 页面骨架。顶栏放指标按钮、白天/夜间切换、走廊筛选、中位价滑杆和搜索框；中间是地图、底图开关和图例；右侧是详情和对比表。样式用 Tailwind CDN，地图用 Leaflet 1.9.4。标题、页眉徽章和 `application-version` 都写着当前版本 `2.9`。项目名称是 LA Area Housing Map。 |
+| `housing_data.json` | 成交数据库，共 331 条，不写在页面代码里。每条有 `id`、`name`、`region`、中心点 `lat`/`lng`、半宽 `dLat`/`dLng`、`median`、`avg`、`min`、`max`、`sales`、`ppsf`、`url` 和 `desc`。`sales` 是近三个月成交套数。`ppsf` 是每平方英尺价格（美元），不是每平方米。样本不足或未公布时，`avg`、`min`、`max`、`ppsf` 为 `null`。 |
 | `app.js` | 地图初始化、四套免费瓦片、格子绘制、筛选、点选详情、对比表，以及白天/夜间切换。`createBasemap()` 按按钮创建单层或多层瓦片。深色底图是深灰底加标注层。 |
-| `start_windows.bat` | Windows 启动脚本。有 Python 时在 8080 端口开本地服务并打开浏览器；没有 Python 时直接打开 `index.html`。 |
-| `start_mac.command` | macOS / Linux 启动脚本。有 `python3` 时同样使用 8080 端口；否则直接打开 `index.html`。 |
+| `start_windows.bat` | Windows 启动脚本。有 Python 时在 8080 端口开本地服务并打开浏览器；没有 Python 时改用 `serve_local.ps1`。 |
+| `serve_local.ps1` | 没有 Python 时的本地服务，同样使用 8080 端口。 |
+| `start_mac.command` | macOS / Linux 启动脚本。有 `python3` 时使用 8080 端口。 |
 | `README.md` | 给使用者的简短中文说明：文件清单和两种打开方式。 |
 | `DEVELOPER_LOG.zh.md` | 本中文开发者日志。 |
 | `DEVELOPER_LOG.en.md` | 英文开发者日志。两边的版本号必须一致，名称各自用自己的语言。 |
@@ -67,6 +68,12 @@
 ## 3. 版本更新记录
 
 以后若发生更新，在本节最上方追加新版本，标题写成 `V版本号-名称`。不要只用日期当标题，也不要另开第三份日志。同时把 `index.html` 的版本号改成新版本：`<title>`、页眉 `vX.Y` 徽章、`<meta name="application-version">`。三者必须相同。英文日志里用同一个版本号，另起一个英文名称。
+
+### V2.9-数据分离
+
+**日期：** 2026-10-31
+
+成交数据不再写在页面代码里。331 个格子的中位价、平均价、最低价、最高价、近三个月成交量和每平方英尺价格都放在 `housing_data.json`。`app.js` 启动时读取这个文件再画地图。以后改数字，改 JSON。`ppsf` 仍是 Redfin 公布的每平方英尺价格，不是每平方米。请用启动脚本打开，不要直接双击 `index.html`。格子数量和 V2.8 的邮编范围没有改。
 
 ### V2.8-大洛杉矶邮编补齐
 

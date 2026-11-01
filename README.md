@@ -1,27 +1,26 @@
 # LA Area Housing Map
 
-LA 周边住房成交价格交互地图，当前版本 **2.8**。
+LA 周边住房成交价格交互地图，当前版本 **2.9**。
 
-地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到内陆帝国，共 331 个网格。V2.8 把大洛杉矶里还偏粗的格子拆到邮编，并补上西侧、南侧、东南和东侧的空白。成交价来自 Redfin，点开区块可以跳到对应页面。版本名称写在 `DEVELOPER_LOG.zh.md`。英文说明在 `DEVELOPER_LOG.en.md`。
+地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到内陆帝国，共 331 个网格。V2.8 把大洛杉矶里还偏粗的格子拆到邮编，并补上西侧、南侧、东南和东侧的空白。V2.9 把成交数据从页面代码里拆到 `housing_data.json`。成交价来自 Redfin，点开区块可以跳到对应页面。版本名称写在 `DEVELOPER_LOG.zh.md`。英文说明在 `DEVELOPER_LOG.en.md`。
 
 ## 项目文件
 
-- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `2.8`
-- `data.js`: 331 个网格的成交数据（可在里面修改或扩充）
-- `app.js`: 地图交互、四维指标热力渲染、免 API Key 底图切换
+- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `2.9`
+- `housing_data.json`: 331 个网格的成交数据库。改价格、成交量或说明时改这个文件
+- `app.js`: 读取上面的 JSON，负责地图交互、四维指标热力渲染、免 API Key 底图切换
 - `start_windows.bat`: Windows 一键启动
+- `serve_local.ps1`: 没有 Python 时，由上面的 bat 调用
 - `start_mac.command`: macOS / Linux 一键启动
 - `DEVELOPER_LOG.zh.md`: 中文功能说明与版本记录。每条版本标题是 `V版本号-名称`
 - `DEVELOPER_LOG.en.md`: 同一份日志的英文版
 
 ## 本地运行
 
-直接双击 `index.html`，用 Chrome、Edge 或 Safari 打开即可。
-
-也可以用本地服务器：
+成交数据在 `housing_data.json`，需要通过本地服务器打开，不要直接双击 `index.html`。
 
 - Windows：双击 `start_windows.bat`，浏览器打开 `http://localhost:8080`
-- Mac：在终端进入本目录，执行 `python3 -m http.server 8080`，然后打开 `http://localhost:8080`。也可以双击 `start_mac.command`
+- Mac：双击 `start_mac.command`。也可以在终端进入本目录，执行 `python3 -m http.server 8080`，然后打开 `http://localhost:8080`
 
 ## 和网站同步
 

@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V2.8-Greater LA ZIP grid  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.8`)  
+**Current version:** V2.9-Data separated  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.9`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -49,15 +49,16 @@ The active basemap button is indigo.
 
 ## 2. Code Structure
 
-This is a static site. There is no build step and no backend. The browser loads Leaflet, then `data.js`, then `app.js`.
+This is a static site. There is no build step and no backend. The browser loads Leaflet and `app.js`. `app.js` then reads `housing_data.json`.
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.8`. The project name is LA Area Housing Map. |
-| `data.js` | Declares `HOUSING_GRID_DATA`, 331 records. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `url` is that cell’s Redfin area page. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.9`. The project name is LA Area Housing Map. |
+| `housing_data.json` | The sales database, 331 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
-| `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it opens `index.html` directly. |
-| `start_mac.command` | macOS / Linux launcher. With `python3` it also uses port 8080. Otherwise it opens `index.html` directly. |
+| `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
+| `serve_local.ps1` | Local server used when Python is missing. It also uses port 8080. |
+| `start_mac.command` | macOS / Linux launcher. With `python3` it uses port 8080. |
 | `README.md` | Short Chinese note for someone opening the project: file list and the two ways to run it. |
 | `DEVELOPER_LOG.zh.md` | The Chinese developer log. |
 | `DEVELOPER_LOG.en.md` | This English developer log. Both files keep the same version number. Each uses a name in its own language. |
@@ -67,6 +68,12 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V2.9-Data separated
+
+**Date:** 2026-10-31
+
+The sales figures are no longer written into the page code. All 331 cells — median, average, low, high, trailing-three-month sales, and price per square foot — live in `housing_data.json`. `app.js` reads that file on startup and then draws the map. Later number changes belong in the JSON. `ppsf` remains Redfin’s price per square foot, not per square meter. Open the site with a launcher. Opening `index.html` directly will not load the JSON. The cell count and the V2.8 ZIP coverage are unchanged.
 
 ### V2.8-Greater LA ZIP grid
 
