@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LA Area Housing Map v1.3</title>
+  <meta name="application-version" content="1.3" />
+  <script>
+    try {
+      if (localStorage.getItem('la-housing-theme') === 'day') {
+        document.documentElement.setAttribute('data-theme', 'day');
+      }
+    } catch (e) {}
+  </script>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    #map { width: 100%; height: 100%; z-index: 1; }
+    .grid-label {
+      background: rgba(15, 23, 42, 0.82);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .leaflet-popup-content-wrapper {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .leaflet-popup-tip { background: #0f172a; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    html[data-theme="night"] { color-scheme: dark; }
+    html[data-theme="day"] { color-scheme: light; }
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      border-radius: 0.5rem;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1;
+      padding: 7px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .theme-toggle:hover { border-color: #818cf8; color: #fff; }
+    html[data-theme="day"] .theme-toggle {
+      background: #ffffff;
+      color: #1e293b;
+      border-color: #cbd5e1;
+    }
+    html[data-theme="day"] .theme-toggle:hover { border-color: #4f46e5; color: #312e81; }
+
+    html[data-theme="day"] body { background-color: #f4f7fb; color: #0f172a; }
+    html[data-theme="day"] .bg-slate-950 { background-color: #f4f7fb; }
+    html[data-theme="day"] .bg-slate-950\/80 { background-color: #e8eef6; }
+    html[data-theme="day"] .bg-slate-950\/60 { background-color: #f8fafc; }
+    html[data-theme="day"] .bg-slate-900 { background-color: #f8fafc; }
+    html[data-theme="day"] .bg-slate-900\/95 { background-color: rgba(255, 255, 255, 0.96); }
+    html[data-theme="day"] .bg-slate-900\/90 { background-color: rgba(255, 255, 255, 0.94); }
+    html[data-theme="day"] .bg-slate-800 { background-color: #ffffff; }
+    html[data-theme="day"] .bg-slate-800\/90 { background-color: #ffffff; }
+    html[data-theme="day"] .bg-slate-800\/60 { background-color: #f1f5f9; }
+    html[data-theme="day"] .bg-indigo-500\/15 { background-color: rgba(79, 70, 229, 0.1); }
+    html[data-theme="day"] .hover\:bg-slate-800:hover { background-color: #e2e8f0; }
+    html[data-theme="day"] .hover\:bg-slate-900:hover { background-color: #eef2ff; }
+    html[data-theme="day"] .border-slate-800,
+    html[data-theme="day"] .border-slate-700,
+    html[data-theme="day"] .border-slate-700\/80,
+    html[data-theme="day"] .border-slate-800\/80 { border-color: #e2e8f0; }
+    html[data-theme="day"] .border-indigo-500\/40 { border-color: rgba(79, 70, 229, 0.35); }
+    html[data-theme="day"] .divide-slate-800\/60 > :not([hidden]) ~ :not([hidden]) { border-color: #e2e8f0; }
+    html[data-theme="day"] .text-white { color: #0f172a; }
+    html[data-theme="day"] .text-slate-200 { color: #334155; }
+    html[data-theme="day"] .text-slate-300 { color: #475569; }
+    html[data-theme="day"] .text-slate-400,
+    html[data-theme="day"] .text-slate-500 { color: #64748b; }
+    html[data-theme="day"] .text-indigo-300,
+    html[data-theme="day"] .text-indigo-400 { color: #4338ca; }
+    html[data-theme="day"] .text-emerald-300,
+    html[data-theme="day"] .text-emerald-400 { color: #047857; }
+    html[data-theme="day"] .text-sky-300,
+    html[data-theme="day"] .text-sky-400 { color: #0369a1; }
+    html[data-theme="day"] .text-rose-300,
+    html[data-theme="day"] .text-rose-400 { color: #be123c; }
+    html[data-theme="day"] .hover\:text-white:hover { color: #0f172a; }
+    html[data-theme="day"] .bg-indigo-600,
+    html[data-theme="day"] .bg-indigo-600.text-white,
+    html[data-theme="day"] #add-compare-btn { color: #ffffff; }
+    html[data-theme="day"] [style*="background:#f97316"],
+    html[data-theme="day"] [style*="background:#ef4444"],
+    html[data-theme="day"] [style*="background:#a855f7"] { color: #ffffff; }
+    html[data-theme="day"] #marker-median { background-color: #0f172a; }
+    html[data-theme="day"] .grid-label {
+      background: rgba(255, 255, 255, 0.94);
+      color: #0f172a;
+      border-color: rgba(15, 23, 42, 0.16);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.16);
+    }
+    html[data-theme="day"] .leaflet-popup-content-wrapper {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: #e2e8f0;
+    }
+    html[data-theme="day"] .leaflet-popup-tip { background: #ffffff; }
+    html[data-theme="day"] .leaflet-popup-close-button { color: #475569; }
+    html[data-theme="day"] ::-webkit-scrollbar-track { background: #e8eef6; }
+    html[data-theme="day"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
+
+  <!-- Top Control Header -->
+  <header class="bg-slate-900/95 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 z-20 shadow-lg">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow">LA</div>
+      <div>
+        <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+          LA Area Housing Map
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v1.3</span>
+        </h1>
+        <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 78 个高密度细分网格 · 四维成交价参数实时切换（免费底图，无需 API Key）</p>
+      </div>
+    </div>
+
+    <!-- Metric Selector -->
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-xs text-slate-400 mr-1">当前地图显示指标:</span>
+      <div id="metric-buttons" class="inline-flex rounded-lg bg-slate-800 p-1 border border-slate-700">
+        <button data-metric="median" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 text-white transition">(a) 成交中位价</button>
+        <button data-metric="avg" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(b) 成交平均值</button>
+        <button data-metric="min" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(c) 成交最低价</button>
+        <button data-metric="max" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(d) 成交最高价</button>
+      </div>
+    </div>
+
+    <button id="theme-toggle" type="button" class="theme-toggle" aria-pressed="false">
+      <span id="theme-toggle-icon" aria-hidden="true">☀</span>
+      <span id="theme-toggle-label">白天模式</span>
+    </button>
+
+    <!-- Filters & Search -->
+    <div class="flex flex-wrap items-center gap-3">
+      <select id="region-filter" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+        <option value="ALL">全部走廊区域 (78 网格)</option>
+        <option value="Santa Barbara">Santa Barbara 区域</option>
+        <option value="Ventura">Ventura / 101 走廊</option>
+        <option value="LA Westside & Coast">LA 西区与海滨</option>
+        <option value="San Fernando Valley">圣费尔南多谷 (SFV)</option>
+        <option value="Central LA">LA 中心城区</option>
+        <option value="San Gabriel Valley">圣盖博谷 (SGV 华人区)</option>
+        <option value="South Bay">南湾 (South Bay)</option>
+        <option value="Orange County North">北橙县 / 尔湾周边</option>
+      </select>
+
+      <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
+        <span class="text-xs text-slate-400">中位价上限:</span>
+        <input id="budget-slider" type="range" min="600000" max="6000000" step="100000" value="6000000" class="w-24 accent-indigo-500 cursor-pointer" />
+        <span id="budget-label" class="text-xs font-mono font-semibold text-indigo-400">不限</span>
+      </div>
+
+      <input id="search-input" type="text" placeholder="搜索城市/区名 (如 Arcadia, Santa Barbara)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-52" />
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="flex-1 flex overflow-hidden relative">
+    <!-- Map Container -->
+    <div class="flex-1 relative">
+      <div id="map"></div>
+
+      <!-- Tile Style Switcher (Top Right) -->
+      <div class="absolute top-3 right-3 z-10 bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl p-1.5 shadow-xl flex items-center gap-1">
+        <span class="text-[11px] text-slate-400 px-2">免费底图:</span>
+        <button data-tile="voyager" class="tile-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white">清爽街景</button>
+        <button data-tile="dark" class="tile-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800">深色热力</button>
+        <button data-tile="osm" class="tile-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800">OSM标准</button>
+        <button data-tile="sat" class="tile-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800">卫星地形</button>
+      </div>
+
+      <!-- Legend (Bottom Left) -->
+      <div class="absolute bottom-5 left-4 z-10 bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl p-3 shadow-xl max-w-xs">
+        <div class="text-xs font-semibold text-slate-200 mb-1.5 flex items-center justify-between">
+          <span id="legend-title">价格热力图例 (成交中位价)</span>
+          <label class="flex items-center gap-1 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="toggle-labels" checked class="accent-indigo-500" /> 显示网格标签
+          </label>
+        </div>
+        <div class="grid grid-cols-5 gap-1 text-[10px] text-center font-mono">
+          <div class="rounded py-1 text-slate-950 font-bold" style="background:#22c55e;">&lt;$900K</div>
+          <div class="rounded py-1 text-slate-950 font-bold" style="background:#eab308;">$900K-1.4M</div>
+          <div class="rounded py-1 text-white font-bold" style="background:#f97316;">$1.4M-2.2M</div>
+          <div class="rounded py-1 text-white font-bold" style="background:#ef4444;">$2.2M-3.5M</div>
+          <div class="rounded py-1 text-white font-bold" style="background:#a855f7;">&gt;$3.5M</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Detail & Comparison Sidebar -->
+    <aside class="w-96 bg-slate-900 border-l border-slate-800 flex flex-col overflow-hidden z-10">
+      <!-- Selected Zone Details -->
+      <div id="zone-detail" class="p-4 border-b border-slate-800 overflow-y-auto flex-1">
+        <div class="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-1" id="detail-region">点击任意地图小区块查看详情</div>
+        <h2 class="text-lg font-bold text-white mb-1" id="detail-name">未选择区块</h2>
+        <p class="text-xs text-slate-400 mb-4" id="detail-desc">请在左侧地图上悬停或点击任意网格区块，查看该区域的成交中位价、均价、最低价与最高价分布。</p>
+
+        <!-- 4 Core Parameters Cards -->
+        <div class="grid grid-cols-2 gap-2.5 mb-4">
+          <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
+            <div class="text-[11px] text-slate-400">(a) 成交中位价 (Median)</div>
+            <div id="val-median" class="text-base font-extrabold text-indigo-400 mt-0.5 font-mono">--</div>
+          </div>
+          <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
+            <div class="text-[11px] text-slate-400">(b) 成交平均值 (Average)</div>
+            <div id="val-avg" class="text-base font-extrabold text-emerald-400 mt-0.5 font-mono">--</div>
+          </div>
+          <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
+            <div class="text-[11px] text-slate-400">(c) 成交最低价 (Min)</div>
+            <div id="val-min" class="text-base font-extrabold text-sky-400 mt-0.5 font-mono">--</div>
+          </div>
+          <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
+            <div class="text-[11px] text-slate-400">(d) 成交最高价 (Max)</div>
+            <div id="val-max" class="text-base font-extrabold text-rose-400 mt-0.5 font-mono">--</div>
+          </div>
+        </div>
+
+        <!-- Visual Price Span Bar -->
+        <div class="bg-slate-800/60 border border-slate-800 rounded-xl p-3 mb-4">
+          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+            <span>最低-最高成交跨度标尺</span>
+            <span id="span-ratio" class="font-mono text-slate-300">均值/中位溢价: --</span>
+          </div>
+          <div class="w-full h-3 bg-slate-950 rounded-full relative overflow-hidden my-2 border border-slate-700">
+            <div id="bar-fill" class="h-full bg-gradient-to-r from-sky-500 via-indigo-500 to-rose-500 rounded-full" style="width: 100%"></div>
+            <div id="marker-median" class="w-1 h-3 bg-white absolute top-0" style="left: 40%" title="中位价位置"></div>
+            <div id="marker-avg" class="w-1 h-3 bg-emerald-300 absolute top-0" style="left: 50%" title="平均价位置"></div>
+          </div>
+          <div class="flex justify-between text-[10px] font-mono text-slate-400">
+            <span id="bar-min-lbl">Min: --</span>
+            <span class="text-white">▎中位</span>
+            <span class="text-emerald-300">▎均值</span>
+            <span id="bar-max-lbl">Max: --</span>
+          </div>
+        </div>
+
+        <!-- Extra Metadata -->
+        <div class="grid grid-cols-3 gap-2 text-center bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/80 mb-3">
+          <div>
+            <div class="text-[10px] text-slate-500">近90天成交量</div>
+            <div id="val-sales" class="text-xs font-bold text-slate-200 mt-0.5">-- 套</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500">每平方英尺均价</div>
+            <div id="val-ppsf" class="text-xs font-bold text-slate-200 mt-0.5">-- /sqft</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500">区块网格编号</div>
+            <div id="val-code" class="text-xs font-bold text-slate-200 mt-0.5">--</div>
+          </div>
+        </div>
+
+        <button id="add-compare-btn" class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition shadow disabled:opacity-40" disabled>
+          + 加入下方候选对比列表
+        </button>
+      </div>
+
+      <!-- Comparison List -->
+      <div class="p-4 bg-slate-950/80 h-60 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">置业候选区块对比 (<span id="compare-count">0</span>)</h3>
+          <button id="clear-compare" class="text-[11px] text-slate-400 hover:text-rose-400">清空</button>
+        </div>
+        <div class="flex-1 overflow-y-auto">
+          <table class="w-full text-left border-collapse text-[11px]">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400">
+                <th class="py-1">区块</th>
+                <th class="py-1">中位价</th>
+                <th class="py-1">平均价</th>
+                <th class="py-1">最低-最高</th>
+              </tr>
+            </thead>
+            <tbody id="compare-tbody" class="divide-y divide-slate-800/60 font-mono">
+              <tr><td colspan="4" class="py-6 text-center text-slate-500 font-sans">点击上方按钮将心仪区域加入横向对比</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Leaflet JS & Custom Data Script -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
