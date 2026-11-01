@@ -32,6 +32,135 @@ function spanValue(zone, field) {
   return val;
 }
 
+function valueAtSpan(zone, span, field) {
+  const source = span === 3 ? zone : (zone['m' + span] || {});
+  const val = source[field];
+  if (val == null || !isFinite(val)) return null;
+  return val;
+}
+
+const CHART_SPANS = [3, 6, 9, 12];
+const CHART_SERIES = [
+  { field: 'min', color: '#38bdf8', name: '最低价' },
+  { field: 'max', color: '#fb7185', name: '最高价' },
+  { field: 'avg', color: '#34d399', name: '平均价' },
+  { field: 'median', color: '#818cf8', name: '中位价' }
+];
+let chartHoverSpan = null;
+let chartXs = null;
+
+function renderPriceChart(zone) {
+  const svg = document.getElementById('price-chart-svg');
+  if (!svg) return;
+  const width = 320;
+  const height = 176;
+  const pad = { l: 52, r: 12, t: 12, b: 28 };
+  const plotW = width - pad.l - pad.r;
+  const plotH = height - pad.t - pad.b;
+  chartXs = {};
+  CHART_SPANS.forEach((span, index) => {
+    chartXs[span] = pad.l + (plotW * index) / (CHART_SPANS.length - 1);
+  });
+
+  const samples = [];
+  CHART_SERIES.forEach((series) => {
+    CHART_SPANS.forEach((span) => {
+      const value = zone ? valueAtSpan(zone, span, series.field) : null;
+      if (value != null) samples.push(value);
+    });
+  });
+  let yMin = 0;
+  let yMax = 1;
+  if (samples.length) {
+    yMin = Math.min.apply(null, samples);
+    yMax = Math.max.apply(null, samples);
+    if (yMin === yMax) {
+      yMin = yMin * 0.85;
+      yMax = yMax * 1.15 || 1;
+    }
+    const padY = (yMax - yMin) * 0.14;
+    yMin = Math.max(0, yMin - padY);
+    yMax += padY;
+  }
+  const yOf = (value) => pad.t + plotH - ((value - yMin) / (yMax - yMin)) * plotH;
+  const focus = chartHoverSpan || currentSpan;
+  const parts = [
+    `<line class="axis" x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t + plotH}"></line>`,
+    `<line class="axis" x1="${pad.l}" y1="${pad.t + plotH}" x2="${width - pad.r}" y2="${pad.t + plotH}"></line>`
+  ];
+  if (samples.length) {
+    [0, 0.5, 1].forEach((tick) => {
+      const value = yMin + (yMax - yMin) * tick;
+      const y = yOf(value);
+      parts.push(`<line class="grid" x1="${pad.l}" y1="${y}" x2="${width - pad.r}" y2="${y}"></line>`);
+      parts.push(`<text class="tick" x="${pad.l - 6}" y="${y + 3}" text-anchor="end">${formatShortUSD(value)}</text>`);
+    });
+  } else {
+    parts.push(`<text class="tick" x="${pad.l + plotW / 2}" y="${pad.t + plotH / 2}" text-anchor="middle">尚无价格点</text>`);
+  }
+  CHART_SPANS.forEach((span) => {
+    parts.push(`<text class="tick" x="${chartXs[span]}" y="${height - 8}" text-anchor="middle">${span}月</text>`);
+  });
+  const guideX = chartXs[focus];
+  parts.push(`<line id="chart-guide" class="guide" x1="${guideX}" y1="${pad.t}" x2="${guideX}" y2="${pad.t + plotH}"></line>`);
+  CHART_SERIES.forEach((series) => {
+    const pts = CHART_SPANS.map((span) => ({ span, value: zone ? valueAtSpan(zone, span, series.field) : null }));
+    let segment = [];
+    const flush = () => {
+      if (segment.length >= 2) {
+        parts.push(`<polyline fill="none" stroke="${series.color}" stroke-width="2" points="${segment.join(' ')}"></polyline>`);
+      }
+      segment = [];
+    };
+    pts.forEach((point) => {
+      if (point.value == null) {
+        flush();
+        return;
+      }
+      segment.push(`${chartXs[point.span]},${yOf(point.value)}`);
+    });
+    flush();
+    pts.forEach((point) => {
+      if (point.value == null) return;
+      const marked = point.span === focus;
+      const radius = marked ? 5 : 3.2;
+      const ring = marked ? ` stroke="#ffffff" stroke-width="1.5"` : '';
+      parts.push(`<circle cx="${chartXs[point.span]}" cy="${yOf(point.value)}" r="${radius}" fill="${series.color}"${ring}></circle>`);
+    });
+  });
+  svg.innerHTML = parts.join('');
+  const readout = document.getElementById('price-chart-readout');
+  const bits = CHART_SERIES.map((series) => {
+    const value = zone ? valueAtSpan(zone, focus, series.field) : null;
+    return `${series.name} ${value == null ? '—' : formatShortUSD(value)}`;
+  });
+  readout.textContent = `${focus} 个月：${bits.join('　')}`;
+}
+
+document.getElementById('price-chart-svg').addEventListener('mousemove', (event) => {
+  if (!chartXs || !selectedZone) return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  const x = ((event.clientX - rect.left) / rect.width) * 320;
+  let best = currentSpan;
+  let bestDist = Infinity;
+  CHART_SPANS.forEach((span) => {
+    const dist = Math.abs(chartXs[span] - x);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = span;
+    }
+  });
+  if (chartHoverSpan === best) return;
+  chartHoverSpan = best;
+  renderPriceChart(selectedZone);
+});
+
+document.getElementById('price-chart-svg').addEventListener('mouseleave', () => {
+  if (chartHoverSpan == null) return;
+  chartHoverSpan = null;
+  if (selectedZone) renderPriceChart(selectedZone);
+});
+
 function formatUSD(num) {
   if (num == null || !isFinite(num)) return '—';
   return '$' + num.toLocaleString('en-US');
@@ -335,6 +464,7 @@ function selectZone(zone) {
 
   const btn = document.getElementById('add-compare-btn');
   btn.disabled = false;
+  renderPriceChart(zone);
   renderGrid();
 }
 
@@ -395,28 +525,81 @@ document.getElementById('region-filter').addEventListener('change', (e) => {
 });
 
 const PRICE_CAPS = {
-  median: { slider: 'budget-slider', label: 'budget-label', max: 6000000 },
-  avg: { slider: 'avg-cap-slider', label: 'avg-cap-label', max: 10000000 },
-  min: { slider: 'min-cap-slider', label: 'min-cap-label', max: 3000000 },
-  max: { slider: 'max-cap-slider', label: 'max-cap-label', max: 20000000 }
+  median: { slider: 'budget-slider', label: 'budget-label', input: 'budget-cap-input', max: 6000000, editable: true },
+  avg: { slider: 'avg-cap-slider', label: 'avg-cap-label', input: null, max: 10000000, editable: false },
+  min: { slider: 'min-cap-slider', label: 'min-cap-label', input: 'min-cap-input', max: 3000000, editable: true },
+  max: { slider: 'max-cap-slider', label: 'max-cap-label', input: 'max-cap-input', max: 20000000, editable: true }
 };
+const customCaps = { median: null, avg: null, min: null, max: null };
 
 function readCap(field) {
   const spec = PRICE_CAPS[field];
   return parseInt(document.getElementById(spec.slider).value, 10);
 }
 
+function activeCap(field) {
+  if (customCaps[field] != null) return customCaps[field];
+  const spec = PRICE_CAPS[field];
+  const cap = readCap(field);
+  if (cap >= spec.max) return null;
+  return cap;
+}
+
+function paintCapLabel(field) {
+  const spec = PRICE_CAPS[field];
+  const label = document.getElementById(spec.label);
+  if (!label) return;
+  if (customCaps[field] != null) {
+    label.textContent = formatShortUSD(customCaps[field]);
+    return;
+  }
+  const val = readCap(field);
+  label.textContent = val >= spec.max ? '不限' : formatShortUSD(val);
+}
+
 function priceCapHides(zone) {
   const fields = ['median', 'avg', 'min', 'max'];
   for (let i = 0; i < fields.length; i += 1) {
     const field = fields[i];
-    const spec = PRICE_CAPS[field];
-    const cap = readCap(field);
-    if (cap >= spec.max) continue;
+    const cap = activeCap(field);
+    if (cap == null) continue;
     const price = spanValue(zone, field);
     if (price == null || price > cap) return true;
   }
   return false;
+}
+
+function openCapEditor(field) {
+  const spec = PRICE_CAPS[field];
+  if (!spec.editable) return;
+  const label = document.getElementById(spec.label);
+  const input = document.getElementById(spec.input);
+  const current = customCaps[field] != null ? customCaps[field] : activeCap(field);
+  input.value = current == null ? '' : String(current);
+  label.classList.add('hidden');
+  input.classList.remove('hidden');
+  input.focus();
+  input.select();
+}
+
+function commitCapEditor(field, cancel) {
+  const spec = PRICE_CAPS[field];
+  const label = document.getElementById(spec.label);
+  const input = document.getElementById(spec.input);
+  if (!cancel) {
+    const raw = input.value.trim();
+    if (raw === '') {
+      customCaps[field] = null;
+      document.getElementById(spec.slider).value = String(spec.max);
+    } else {
+      const num = Number(raw);
+      if (isFinite(num) && num > 0) customCaps[field] = num;
+    }
+  }
+  input.classList.add('hidden');
+  label.classList.remove('hidden');
+  paintCapLabel(field);
+  renderGrid();
 }
 
 function readQueryBound(id) {
@@ -470,10 +653,27 @@ function syncPriceQueryInputs() {
 document.querySelectorAll('.price-cap').forEach((slider) => {
   slider.addEventListener('input', () => {
     const field = slider.getAttribute('data-field');
-    const spec = PRICE_CAPS[field];
-    const val = parseInt(slider.value, 10);
-    document.getElementById(spec.label).textContent = val >= spec.max ? '不限' : formatShortUSD(val);
+    customCaps[field] = null;
+    paintCapLabel(field);
     renderGrid();
+  });
+});
+
+['median', 'min', 'max'].forEach((field) => {
+  const spec = PRICE_CAPS[field];
+  document.getElementById(spec.label).addEventListener('click', () => openCapEditor(field));
+  const input = document.getElementById(spec.input);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') input.blur();
+    if (event.key === 'Escape') {
+      input.dataset.cancel = '1';
+      input.blur();
+    }
+  });
+  input.addEventListener('blur', () => {
+    const cancel = input.dataset.cancel === '1';
+    input.dataset.cancel = '';
+    commitCapEditor(field, cancel);
   });
 });
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v4.0</title>
-  <meta name="application-version" content="4.0" />
+  <title>LA Area Housing Map v4.1</title>
+  <meta name="application-version" content="4.1" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -171,6 +171,16 @@
     }
     #panel-resizer:hover::after,
     #panel-resizer.dragging::after { background: #6366f1; }
+    button.cap-label { background: transparent; border: 0; padding: 0; cursor: pointer; }
+    button.cap-label:hover { text-decoration: underline; }
+    .cap-input { width: 5.5rem; }
+    #price-chart-svg .axis { stroke: #475569; stroke-width: 1; }
+    #price-chart-svg .grid { stroke: #334155; stroke-width: 1; stroke-dasharray: 2 3; }
+    #price-chart-svg .tick { fill: #94a3b8; font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    #price-chart-svg .guide { stroke: #e2e8f0; stroke-width: 1; }
+    html[data-theme="day"] #price-chart-svg .grid { stroke: #cbd5e1; }
+    html[data-theme="day"] #price-chart-svg .tick { fill: #475569; }
+    html[data-theme="day"] #price-chart-svg .guide { stroke: #0f172a; }
     #map-tools { z-index: 40; }
     @media (max-width: 800px) {
       #price-caps {
@@ -206,7 +216,7 @@
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.0</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.1</span>
         </h1>
         <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 506 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
@@ -292,7 +302,8 @@
       <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
         <span class="text-xs text-slate-400">中位价上限:</span>
         <input id="budget-slider" data-field="median" type="range" min="200000" max="6000000" step="50000" value="6000000" class="price-cap w-24 accent-indigo-500 cursor-pointer" />
-        <span id="budget-label" class="text-xs font-mono font-semibold text-indigo-400 w-16 text-right">不限</span>
+        <button type="button" id="budget-label" class="cap-label text-xs font-mono font-semibold text-indigo-400 min-w-16 text-right" title="点击输入自定义上限，留空恢复不限">不限</button>
+        <input id="budget-cap-input" data-field="median" type="number" min="0" step="10000" placeholder="上限" class="cap-input hidden bg-slate-900 border border-slate-600 rounded px-1 py-0.5 text-xs font-mono text-slate-200" />
       </div>
       <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
         <span class="text-xs text-slate-400">平均价上限:</span>
@@ -302,12 +313,14 @@
       <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
         <span class="text-xs text-slate-400">最低价上限:</span>
         <input id="min-cap-slider" data-field="min" type="range" min="50000" max="3000000" step="50000" value="3000000" class="price-cap w-24 accent-sky-500 cursor-pointer" />
-        <span id="min-cap-label" class="text-xs font-mono font-semibold text-sky-400 w-16 text-right">不限</span>
+        <button type="button" id="min-cap-label" class="cap-label text-xs font-mono font-semibold text-sky-400 min-w-16 text-right" title="点击输入自定义上限，留空恢复不限">不限</button>
+        <input id="min-cap-input" data-field="min" type="number" min="0" step="10000" placeholder="上限" class="cap-input hidden bg-slate-900 border border-slate-600 rounded px-1 py-0.5 text-xs font-mono text-slate-200" />
       </div>
       <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
         <span class="text-xs text-slate-400">最高价上限:</span>
         <input id="max-cap-slider" data-field="max" type="range" min="500000" max="20000000" step="250000" value="20000000" class="price-cap w-24 accent-rose-500 cursor-pointer" />
-        <span id="max-cap-label" class="text-xs font-mono font-semibold text-rose-400 w-16 text-right">不限</span>
+        <button type="button" id="max-cap-label" class="cap-label text-xs font-mono font-semibold text-rose-400 min-w-16 text-right" title="点击输入自定义上限，留空恢复不限">不限</button>
+        <input id="max-cap-input" data-field="max" type="number" min="0" step="10000" placeholder="上限" class="cap-input hidden bg-slate-900 border border-slate-600 rounded px-1 py-0.5 text-xs font-mono text-slate-200" />
       </div>
       </div>
 
@@ -416,6 +429,20 @@
           <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
             <div class="text-[11px] text-slate-400">(d) 成交最高价 (Max)</div>
             <div id="val-max" class="text-base font-extrabold text-rose-400 mt-0.5 font-mono">--</div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="text-[11px] font-semibold text-indigo-400 mb-1">售价走势</div>
+          <div id="price-chart" class="bg-slate-800/60 border border-slate-800 rounded-xl p-2">
+            <svg id="price-chart-svg" viewBox="0 0 320 176" class="w-full h-40 block" role="img" aria-label="3到12个月的最低价、最高价、平均价和中位价曲线"></svg>
+            <p id="price-chart-readout" class="mt-1 text-[11px] leading-relaxed text-slate-300 font-mono">把鼠标移到曲线上查看某一周期的价格。</p>
+          </div>
+          <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[10px]">
+            <span class="text-sky-400">最低价</span>
+            <span class="text-rose-400">最高价</span>
+            <span class="text-emerald-400">平均价</span>
+            <span class="text-indigo-400">中位价</span>
           </div>
         </div>
 
