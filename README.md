@@ -1,13 +1,13 @@
 # LA Area Housing Map
 
-LA 周边住房成交价格交互地图，当前版本 **2.7**。
+LA 周边住房成交价格交互地图，当前版本 **2.8**。
 
-地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到内陆帝国，共 270 个网格。V2.7 把洛杉矶北侧谷地、帕萨迪纳、阿尔塔迪纳、格兰代尔和伯班克拆成单独邮编格子。成交价来自 Redfin，点开区块可以跳到对应页面。版本名称写在 `DEVELOPER_LOG.zh.md`。英文说明在 `DEVELOPER_LOG.en.md`。
+地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到内陆帝国，共 331 个网格。V2.8 把大洛杉矶里还偏粗的格子拆到邮编，并补上西侧、南侧、东南和东侧的空白。成交价来自 Redfin，点开区块可以跳到对应页面。版本名称写在 `DEVELOPER_LOG.zh.md`。英文说明在 `DEVELOPER_LOG.en.md`。
 
 ## 项目文件
 
-- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `2.7`
-- `data.js`: 270 个网格的成交数据（可在里面修改或扩充）
+- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `2.8`
+- `data.js`: 331 个网格的成交数据（可在里面修改或扩充）
 - `app.js`: 地图交互、四维指标热力渲染、免 API Key 底图切换
 - `start_windows.bat`: Windows 一键启动
 - `start_mac.command`: macOS / Linux 一键启动

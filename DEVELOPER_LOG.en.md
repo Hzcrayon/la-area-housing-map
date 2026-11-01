@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V2.7-North valley  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.7`)  
+**Current version:** V2.8-Greater LA ZIP grid  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.8`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -14,9 +14,9 @@ After every later change to features, data, or basemaps, add an entry at the top
 
 ## 1. Task and Features
 
-This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches northern Orange County to the southeast. It is divided into 270 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a trailing-90-day sales count, a price per square foot, and a short area note.
+This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches northern Orange County to the southeast. It is divided into 331 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a trailing-90-day sales count, a price per square foot, and a short area note.
 
-On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SGV-09`). The map can be panned and zoomed from level 7 through 16.
+On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SG09`, ZIP 91006). The map can be panned and zoomed from level 7 through 16.
 
 **Four price metrics.** The header has four buttons: (a) median, (b) average, (c) minimum, and (d) maximum. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. Color breaks are: under $900K green, $900K to $1.4M gold, $1.4M to $2.2M orange, $2.2M to $3.5M red, and above $3.5M violet.
 
@@ -31,11 +31,11 @@ The active basemap button is indigo.
 
 **Day and night.** The header button names the mode currently on screen. The page opens in day mode: header, sidebar, legend, and popups are white and light gray, and the button reads 「白天模式」. One click turns those panels dark and changes the button to 「夜间模式」. Clicking again returns to the light interface and 「白天模式」. Price figures stay indigo, green, sky, and rose so they can still be told apart. Cell price tags in day mode are white chips with dark type. The map basemap itself does not invert. The choice is stored in the browser and kept on the next visit. V1.31 clears the night default that older versions saved automatically, so the first open after that update is day mode.
 
-**Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (10), LA Westside and coast (10), Beverly Hills (3), Culver City (2), Inglewood (5), San Fernando Valley (35), Burbank (5), Glendale (9), Pasadena (6), Altadena (1), Central LA (8), Downtown LA (6), USC (6), Southeast LA / Gateway Cities (35), San Gabriel Valley (13), South Bay (5), Torrance (5), Long Beach (11), the remaining northern Orange County cities (4), Fullerton (4), Brea (2), Anaheim (7), Garden Grove (5), Santa Ana (6), Huntington Beach (4), Irvine (8), Pomona (3), Ontario (3), Fontana (3), San Bernardino (7), Riverside (7), Moreno Valley (4), Corona (5), or the Inland Empire interior (13). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
+**Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (10), LA Westside and coast (13), Southwest LA (11), Beverly Hills (3), Culver City (2), Inglewood (5), San Fernando Valley (35), Burbank (5), Glendale (9), Pasadena (6), Altadena (1), Central LA (17), Downtown LA (6), USC (6), Southeast LA / Gateway Cities (38), San Gabriel Valley (32), South Bay (12), Torrance (5), Long Beach (11), Cerritos (1), Cypress (1), Buena Park (2), Costa Mesa (2), Tustin (2), Yorba Linda (2), Newport Beach (3), Fullerton (4), Brea (2), Anaheim (7), Garden Grove (5), Santa Ana (6), Huntington Beach (4), Irvine (8), Pomona (3), Ontario (3), Fontana (3), San Bernardino (7), Riverside (7), Moreno Valley (4), Corona (5), or the Inland Empire interior (13). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
 
 **Median cap.** The slider runs from $600K to $6M in $100K steps. The right end is labeled unlimited and keeps every cell. A lower cap hides cells whose median is above that cap.
 
-**Search.** Typing part of a city name, neighborhood, or cell id, such as `Arcadia` or `SGV-09`, hides cells that do not match. Matching ignores case and checks both the name and the id.
+**Search.** Typing part of a city name, neighborhood, or cell id, such as `Arcadia` or `SG09`, hides cells that do not match. Matching ignores case and checks both the name and the id.
 
 **Cell labels.** 「显示网格标签」 is on by default. Each cell then shows a dark tag such as `$1.95M`. Turning it off leaves only the colored cells.
 
@@ -53,8 +53,8 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.7`. The project name is LA Area Housing Map. |
-| `data.js` | Declares `HOUSING_GRID_DATA`, 270 records. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `url` is that cell’s Redfin area page. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.8`. The project name is LA Area Housing Map. |
+| `data.js` | Declares `HOUSING_GRID_DATA`, 331 records. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `url` is that cell’s Redfin area page. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it opens `index.html` directly. |
 | `start_mac.command` | macOS / Linux launcher. With `python3` it also uses port 8080. Otherwise it opens `index.html` directly. |
@@ -67,6 +67,22 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V2.8-Greater LA ZIP grid
+
+**Date:** 2026-10-31
+
+Brought the rest of greater Los Angeles down to one ZIP per cell, and filled the gaps. The map grew from 270 cells to 331. The Santa Barbara and Ventura corridors were left as they were.
+
+On the west side, added Playa Vista 90094, Playa del Rey 90293, Westchester 90045, Westmont 90047, Hawthorne 90250, and Lawndale 90260, plus Ladera Heights, View Park, Athens, and South LA 90003, 90044, and 90061. El Segundo is no longer paired with Playa Vista.
+
+On the south side, split San Pedro from Harbor City, Hermosa Beach from Redondo Beach, and Palos Verdes Estates from Rancho Palos Verdes. Added Lomita 90717, Harbor City 90710, and Wilmington 90744.
+
+On the southeast side, split Cerritos from Cypress. Cypress 90630 and Buena Park 90620 and 90621 are their own cells. La Palma, Artesia, and Hawaiian Gardens were added to Southeast LA.
+
+On the east side, split West Covina from Glendora, Hacienda Heights from Rowland Heights, El Monte from Rosemead, and Monrovia from Bradbury. Added Avocado Heights, La Puente, Baldwin Park, Azusa, Covina, Glendora, and San Dimas. The other San Gabriel Valley city cells are now ZIPs too: South Pasadena, San Marino, Alhambra, Monterey Park, San Gabriel, Temple City, and Arcadia.
+
+The westside coast, central LA, Costa Mesa and Tustin, Yorba Linda, Newport Beach, and Calabasas are ZIP cells as well. Each new rectangle is the bounding box of that ZIP’s polygon on Redfin. The median and price per square foot are Redfin’s published figures for the period ending September 2026. `sales` is the sum of the July, August, and September 2026 published counts. Average, low, and high follow the V2.1 rule. Each link is `https://www.redfin.com/zipcode/<zip>/housing-market`.
 
 ### V2.7-North valley
 

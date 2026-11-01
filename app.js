@@ -1,4 +1,4 @@
-// LA Area Housing Map：Leaflet 免费底图切换 + 270个网格多边形渲染 + 四维参数动态联动
+// LA Area Housing Map：Leaflet 免费底图切换 + 331个网格多边形渲染 + 四维参数动态联动
 let currentMetric = 'median';
 let showLabels = true;
 let selectedZone = null;
@@ -316,4 +316,4 @@ applyTheme(document.documentElement.getAttribute('data-theme') === 'day' ? 'day'
 
 // 默认选中 Arcadia 作为初始展示
 renderGrid();
-selectZone(HOUSING_GRID_DATA.find(z => z.id === 'SGV-09'));
+selectZone(HOUSING_GRID_DATA.find(z => z.id === 'SG09'));
