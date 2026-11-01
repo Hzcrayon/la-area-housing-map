@@ -195,11 +195,21 @@ function renderGrid() {
   });
 }
 
+function housingNote(zone) {
+  const ppsfText = zone.ppsf == null ? '每平方英尺价格未公布' : `每平方英尺均价 $${zone.ppsf}`;
+  const hasRange = zone.avg != null && zone.min != null && zone.max != null;
+  const rangeText = hasRange
+    ? `平均价 ${formatUSD(zone.avg)}，最低价 ${formatUSD(zone.min)}，最高价 ${formatUSD(zone.max)}。平均价与高低价来自该页返回的近 90 天成交。`
+    : '近 90 天返回的成交不足以计算平均价、最低价和最高价。';
+  return `中位价 ${formatUSD(zone.median)}，${ppsfText}，近三个月成交 ${zone.sales} 套。${rangeText}中位价和每平方英尺价格来自 Redfin 公布值。`;
+}
+
 function selectZone(zone) {
   selectedZone = zone;
   document.getElementById('detail-region').textContent = `${zone.region} · 网格编号 ${zone.id}`;
   document.getElementById('detail-name').textContent = zone.name;
   document.getElementById('detail-desc').textContent = zone.desc;
+  document.getElementById('housing-note').textContent = housingNote(zone);
   const redfinLink = document.getElementById('redfin-link');
   if (zone.url) {
     redfinLink.href = zone.url;

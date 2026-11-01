@@ -1,13 +1,13 @@
 # LA Area Housing Map
 
-LA 周边住房成交价格交互地图，当前版本 **3.0**。
+LA 周边住房成交价格交互地图，当前版本 **3.1**。
 
-地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到内陆帝国，共 331 个网格。V2.8 把大洛杉矶里还偏粗的格子拆到邮编，并补上西侧、南侧、东南和东侧的空白。V2.9 把成交数据从页面代码里拆到 `housing_data.json`。V3.0 让右侧说明框可以收起，并把价格热力图分成 16 档。成交价来自 Redfin，点开区块可以跳到对应页面。版本名称写在 `DEVELOPER_LOG.zh.md`。英文说明在 `DEVELOPER_LOG.en.md`。
+地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到内陆帝国，共 331 个网格。V2.8 把大洛杉矶里还偏粗的格子拆到邮编，并补上西侧、南侧、东南和东侧的空白。V2.9 把成交数据从页面代码里拆到 `housing_data.json`。V3.0 让右侧说明框可以收起，并把价格热力图分成 16 档。V3.1 把每个地区的说明改成区域简介，成交数字的文字说明改到房价旁边。成交价来自 Redfin，点开区块可以跳到对应页面。版本名称写在 `DEVELOPER_LOG.zh.md`。英文说明在 `DEVELOPER_LOG.en.md`。
 
 ## 项目文件
 
-- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `3.0`
-- `housing_data.json`: 331 个网格的成交数据库。改价格、成交量或说明时改这个文件
+- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `3.1`
+- `housing_data.json`: 331 个网格的成交数据库和区域简介。改价格、成交量或简介时改这个文件
 - `app.js`: 读取上面的 JSON，负责地图交互、四维指标热力渲染、免 API Key 底图切换
 - `start_windows.bat`: Windows 一键启动
 - `serve_local.ps1`: 没有 Python 时，由上面的 bat 调用

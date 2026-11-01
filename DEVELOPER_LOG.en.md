@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V3.0-Collapsible notes and heat bins  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.0`)  
+**Current version:** V3.1-Area introductions  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.1`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -43,7 +43,7 @@ The active basemap button is indigo.
 
 **Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
 
-**Detail panel.** The panel shows the corridor, cell id, bilingual name, and description; four price cards; a bar from the low to the high, with a white mark for the median and a green mark for the average, plus how far the average sits above the median; and the 90-day sales count, price per square foot, and cell id.
+**Detail panel.** Under the place name is an introduction: what the area is like, a rough population, the kind of neighborhood, and a landmark, campus, beach, or old town. Below that are the four price cards, the bar from low to high, and the trailing-three-month sales, price per square foot, and cell id. A small gray note under those figures restates the median, price per square foot, sales count, average, low, and high, and says the figures come from Redfin.
 
 **Comparison list.** 「加入下方候选对比列表」 adds the current area to the table at the lower right: name, median, average, and low-to-high range. The same cell is not added twice. 「清空」 clears the table. The add button stays disabled until a cell is selected.
 
@@ -55,7 +55,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.0`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.1`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 331 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -70,6 +70,14 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V3.1-Area introductions
+
+**Date:** 2026-11-01
+
+The lines under each place name no longer explain where the sale figures came from. All 331 cells now have an area introduction in the `desc` field of `housing_data.json`: the character of the place, an approximate population, the kind of neighborhood, and a mall, campus, beach, or old town where that fits. Populations are rounded, not written as exact headcounts.
+
+The median, price per square foot, trailing-three-month sales, average, low, and high now also appear in small gray type under the housing figures, with a note that the numbers come from Redfin. The large figures on the price cards stay. The cell count and the sale numbers are unchanged.
 
 ### V3.0-Collapsible notes and heat bins
 
