@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V4.41-Wider notes column  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.41`)  
+**Current version:** V4.5-Westside and valley history  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.5`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -14,13 +14,13 @@ After every later change to features, data, or basemaps, add an entry at the top
 
 ## 1. Task and Features
 
-This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches the south Orange County coast to the southeast. It is divided into 506 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a sales count, a price per square foot, and a short area note. Those six figures on the record itself are the trailing three months. Each record also has `m6`, `m9`, and `m12` in the same shape for six, nine, and twelve months. The 506 cells are split into five region batches. Batch 1, the central group of 97, is filled. The other four batches are still null.
+This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches the south Orange County coast to the southeast. It is divided into 506 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a sales count, a price per square foot, and a short area note. Those six figures on the record itself are the trailing three months. Each record also has `m6`, `m9`, and `m12` in the same shape for six, nine, and twelve months. The 506 cells are split into five region batches. Batch 1, the central group of 97, and batch 2, the westside and valley group of 101, are filled. The other three batches are still null.
 
 At the bottom of the detail write-up, just above the comparison list, a smaller note states where the four sale prices come from, how current they are, and why they were chosen that way. The source is Redfin’s housing-market pages and closed-sale lists, all home types, with nothing typed in by hand. Each cell links to its own page. The median is the published figure for the period ending 2026-09-30, so every area uses the same month. Average, low, and high use returned sales from 2026-08-03 onward, and only when there are at least eight sales, none under $50,000, and the median sits between the low and the high. Otherwise those three stay blank. The set is a snapshot from around 2026-11-01. Switching metrics only changes which saved number is shown.
 
 On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SG09`, ZIP 91006). The map can be panned and zoomed from level 7 through 16.
 
-**History window.** Next to the metric buttons are 3 months, 6 months, 9 months, and 12 months. The heat map, cell tags, detail prices, price caps, and price search all follow the selected window. Three months uses the figures already stored on each record. Batch 1 now has six-, nine-, and twelve-month figures. The other batches stay gray 「无数据」 with 「—」 in the detail panel. Later numbers can be filled into the same fields without another page change.
+**History window.** Next to the metric buttons are 3 months, 6 months, 9 months, and 12 months. The heat map, cell tags, detail prices, price caps, and price search all follow the selected window. Three months uses the figures already stored on each record. Batches 1 and 2 now have six-, nine-, and twelve-month figures. The other batches stay gray 「无数据」 with 「—」 in the detail panel. Later numbers can be filled into the same fields without another page change.
 
 **Map coloring.** The header has seven buttons: (a) median, (b) average, (c) minimum, (d) maximum, (e) price per square foot, (f) safety, and (g) drive time to USC. Choosing one repaints every cell. The legend title and chips follow that choice, in two columns. On a price map, a cell with no figure is gray, labeled 「无数据」. Safety and drive time ignore the month window. They use the safety tier and the daytime drive already stored on each cell.
 
@@ -78,8 +78,8 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.41`. The project name is LA Area Housing Map. |
-| `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `m6`, `m9`, `m12`, `url`, `desc`, `shops`, `safety`, and `uscMin`. The top-level six figures are the trailing three months. `m6`, `m9`, and `m12` are the 6-, 9-, and 12-month windows. Batch 1 is filled; the rest are `null`. `ppsf` is dollars per square foot as published by Redfin, not per square meter. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.5`. The project name is LA Area Housing Map. |
+| `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `m6`, `m9`, `m12`, `url`, `desc`, `shops`, `safety`, and `uscMin`. The top-level six figures are the trailing three months. `m6`, `m9`, and `m12` are the 6-, 9-, and 12-month windows. Batches 1 and 2 are filled; the rest are `null`. `ppsf` is dollars per square foot as published by Redfin, not per square meter. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
 | `serve_local.ps1` | Local server used when Python is missing. It also uses port 8080. |
@@ -93,6 +93,14 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V4.5-Westside and valley history
+
+**Date:** 2026-11-01
+
+Batch 2 now has 6-, 9-, and 12-month figures: 101 cells in LA Westside & Coast, San Fernando Valley, Glendale, Pasadena, and Altadena. The rules match batch 1. `sales` is the sum of Redfin’s published monthly homes-sold counts, still ending with September 2026. Median, average, low, high, and price per square foot come from the returned closed-sale list, with prices of at least $50,000 and per-square-foot values between 50 and 8,000. Fewer than eight sales, or a sample median outside the low and the high, leaves those price fields null. If the monthly counts are not contiguous back from September 2026, that window’s `sales` stays null. Requests were spaced out, and none were blocked. Batch 1 and the existing 3-month numbers were left as they were.
+
+In this batch, Santa Monica 90401 (`LW05`) publishes 13 sales for six months, but the returned sample is under eight, so its six-month prices stay null while nine and twelve months are filled. Sierra Madre Villa in Pasadena (`N115711`) does not have a monthly count series that runs continuously back from September 2026, so all three windows leave `sales` null; its nine- and twelve-month prices come from the returned sales.
 
 ### V4.41-Wider notes column
 
