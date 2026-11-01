@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v2.4</title>
-  <meta name="application-version" content="2.4" />
+  <title>LA Area Housing Map v2.5</title>
+  <meta name="application-version" content="2.5" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -138,9 +138,9 @@
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v2.4</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v2.5</span>
         </h1>
-        <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 148 个高密度细分网格 · 四维成交价参数实时切换</p>
+        <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 180 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
     </div>
 
@@ -163,7 +163,7 @@
     <!-- Filters & Search -->
     <div class="flex flex-wrap items-center gap-3">
       <select id="region-filter" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-        <option value="ALL">全部走廊区域 (148 网格)</option>
+        <option value="ALL">全部走廊区域 (180 网格)</option>
         <option value="Santa Barbara">Santa Barbara 区域</option>
         <option value="Ventura">Ventura / 101 走廊</option>
         <option value="LA Westside & Coast">LA 西区与海滨</option>
@@ -179,7 +179,14 @@
         <option value="South Bay">南湾 (South Bay)</option>
         <option value="Torrance">托伦斯 (Torrance)</option>
         <option value="Long Beach">长滩 (Long Beach)</option>
-        <option value="Orange County North">北橙县 / 尔湾周边</option>
+        <option value="Orange County North">北橙县其余城市</option>
+        <option value="Fullerton">富勒顿 (Fullerton)</option>
+        <option value="Brea">布雷亚 (Brea)</option>
+        <option value="Anaheim">安纳海姆 (Anaheim)</option>
+        <option value="Garden Grove">加登格罗夫 (Garden Grove)</option>
+        <option value="Santa Ana">圣安娜 (Santa Ana)</option>
+        <option value="Huntington Beach">亨廷顿海滩 (Huntington Beach)</option>
+        <option value="Irvine">尔湾 (Irvine)</option>
       </select>
 
       <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
