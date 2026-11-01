@@ -48,13 +48,26 @@ const CHART_SERIES = [
 ];
 let chartHoverSpan = null;
 let chartXs = null;
+let chartWidth = 320;
+
+function chartBox() {
+  const svg = document.getElementById('price-chart-svg');
+  const displayed = svg ? Math.round(svg.getBoundingClientRect().width) : 0;
+  const width = Math.max(220, displayed || 320);
+  const height = Math.round(Math.min(250, Math.max(148, 118 + width * 0.12)));
+  return { width, height };
+}
 
 function renderPriceChart(zone) {
   const svg = document.getElementById('price-chart-svg');
   if (!svg) return;
-  const width = 320;
-  const height = 176;
-  const pad = { l: 52, r: 12, t: 12, b: 28 };
+  const box = chartBox();
+  const width = box.width;
+  const height = box.height;
+  chartWidth = width;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.style.height = height + 'px';
+  const pad = { l: 52, r: 16, t: 12, b: 28 };
   const plotW = width - pad.l - pad.r;
   const plotH = height - pad.t - pad.b;
   chartXs = {};
@@ -140,7 +153,7 @@ function renderPriceChart(zone) {
 document.getElementById('price-chart-svg').addEventListener('mousemove', (event) => {
   if (!chartXs || !selectedZone) return;
   const rect = event.currentTarget.getBoundingClientRect();
-  const x = ((event.clientX - rect.left) / rect.width) * 320;
+  const x = ((event.clientX - rect.left) / rect.width) * chartWidth;
   let best = currentSpan;
   let bestDist = Infinity;
   CHART_SPANS.forEach((span) => {
@@ -764,6 +777,7 @@ function setPanelOpen(open) {
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   document.getElementById('panel-toggle-label').textContent = open ? '收起说明' : '显示说明';
   refreshMapSize();
+  if (open) requestAnimationFrame(() => renderPriceChart(selectedZone));
 }
 
 const panelStartsClosed = document.documentElement.classList.contains('panel-start-collapsed');
@@ -775,8 +789,11 @@ document.getElementById('panel-toggle').addEventListener('click', () => {
 
 function panelLimits() {
   const viewport = window.innerWidth;
-  const max = Math.max(280, Math.min(560, Math.round(viewport * 0.5)));
-  const min = viewport <= 800 ? 260 : 300;
+  const narrow = viewport <= 800;
+  const min = narrow ? 260 : 300;
+  const max = narrow
+    ? Math.max(min, Math.min(480, viewport - 24))
+    : Math.max(min, Math.min(1100, viewport - 280));
   return { min: Math.min(min, max), max };
 }
 
@@ -785,13 +802,15 @@ function applyPanelWidth(px) {
   const width = Math.max(limits.min, Math.min(limits.max, px));
   document.getElementById('detail-panel').style.width = width + 'px';
   try { localStorage.setItem('la-housing-panel-width', String(width)); } catch (e) {}
+  if (document.getElementById('price-chart-svg')) renderPriceChart(selectedZone);
   return width;
 }
 
 let initialPanelWidth = 384;
 try {
   const savedWidth = parseInt(localStorage.getItem('la-housing-panel-width'), 10);
-  if (savedWidth >= 260 && savedWidth <= 560) initialPanelWidth = savedWidth;
+  const limits = panelLimits();
+  if (savedWidth >= limits.min && savedWidth <= limits.max) initialPanelWidth = savedWidth;
 } catch (e) {}
 applyPanelWidth(initialPanelWidth);
 window.addEventListener('resize', () => {

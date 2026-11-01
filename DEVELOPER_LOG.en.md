@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V4.22-Custom average cap  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.22`)  
+**Current version:** V4.31-Readme opening  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.31`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -16,7 +16,7 @@ After every later change to features, data, or basemaps, add an entry at the top
 
 This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches the south Orange County coast to the southeast. It is divided into 506 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a sales count, a price per square foot, and a short area note. Those six figures on the record itself are the trailing three months. Each record also has `m6`, `m9`, and `m12` in the same shape for six, nine, and twelve months. The 506 cells are split into five region batches. Batch 1, the central group of 97, is filled. The other four batches are still null.
 
-Under the header subtitle, a short note states where the four sale prices come from, how current they are, and why they were chosen that way. The source is Redfin’s housing-market pages and closed-sale lists, all home types, with nothing typed in by hand. Each cell links to its own page. The median is the published figure for the period ending 2026-09-30, so every area uses the same month. Average, low, and high use returned sales from 2026-08-03 onward, and only when there are at least eight sales, none under $50,000, and the median sits between the low and the high. Otherwise those three stay blank. The set is a snapshot from around 2026-11-01. Switching metrics only changes which saved number is shown.
+At the bottom of the detail write-up, just above the comparison list, a smaller note states where the four sale prices come from, how current they are, and why they were chosen that way. The source is Redfin’s housing-market pages and closed-sale lists, all home types, with nothing typed in by hand. Each cell links to its own page. The median is the published figure for the period ending 2026-09-30, so every area uses the same month. Average, low, and high use returned sales from 2026-08-03 onward, and only when there are at least eight sales, none under $50,000, and the median sits between the low and the high. Otherwise those three stay blank. The set is a snapshot from around 2026-11-01. Switching metrics only changes which saved number is shown.
 
 On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SG09`, ZIP 91006). The map can be panned and zoomed from level 7 through 16.
 
@@ -60,11 +60,11 @@ The active basemap button is indigo.
 
 **Hover, select, and popup.** Hovering a cell thickens its outline and deepens the fill. Clicking it loads that area in the side panel and turns the outline white. Clicking again opens a popup with all four prices.
 
-**Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). The column’s left edge can be dragged. On a wide screen the narrowest open width is about 300 pixels and the widest is about 560 pixels, and never more than half the window. Dragging stops at the minimum width and does not close the column. Only 「收起说明」 hides it. On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
+**Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). The column’s left edge can be dragged. On a wide screen the narrowest open width is about 300 pixels and the widest is about 1100 pixels, while leaving about 280 pixels for the map. On a narrow screen the limits are about 260 and 480 pixels, and the column stays inside the window. Dragging stops at the minimum width and does not close the column. The four price cards stack in one column below about 360 pixels, sit in two columns through the middle widths, and line up in one row from about 640 pixels up. At that wider size the introduction sits beside errands, and safety sits beside the drive to USC. In a narrow column the sales count, price per square foot, and cell id stack vertically. Only 「收起说明」 hides it. On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
 
-**Price lines.** The detail panel includes a line chart. The horizontal axis is 3, 6, 9, and 12 months. The vertical axis is sale price. Four lines share the chart: low, high, average, and median. A month with no number has no dot and no invented segment. All four months stay on the chart no matter which window is selected in the header. The guide line starts on the selected window. Moving the pointer snaps the guide to the nearest month and lists that month’s four prices. An empty month reads 「—」.
+**Price lines.** The detail panel includes a line chart. The horizontal axis is 3, 6, 9, and 12 months. The vertical axis is sale price. Four lines share the chart: low, high, average, and median. A month with no number has no dot and no invented segment. All four months stay on the chart no matter which window is selected in the header. The guide line starts on the selected window. Moving the pointer snaps the guide to the nearest month and lists that month’s four prices. Widening the column lengthens the horizontal axis, narrowing it shortens that axis, and the chart height changes a little with the width. An empty month reads 「—」.
 
-**Detail panel.** Under the place name is an introduction: what the area is like, a rough population, the kind of neighborhood, and a landmark, campus, beach, or old town. Next come errands (a small market, or a larger chain such as Costco, Walmart, Ralphs, Target, Trader Joe's, or 99 Ranch, plus CVS and coffee), the safety tier, and the approximate drive to USC. Below that are the four price cards, the bar from low to high (green at the low end, red at the high end), and the trailing-three-month sales, price per square foot, and cell id. A small gray note under those figures restates the sale numbers.
+**Detail panel.** Under the place name is an introduction: what the area is like, a rough population, the kind of neighborhood, and a landmark, campus, beach, or old town. Next come errands (a small market, or a larger chain such as Costco, Walmart, Ralphs, Target, Trader Joe's, or 99 Ranch, plus CVS and coffee), the safety tier, and the approximate drive to USC. Below that are the four price cards, the bar from low to high (green at the low end, red at the high end), and the trailing-three-month sales, price per square foot, and cell id. A small gray note under those figures restates the sale numbers. A still smaller note at the bottom of that write-up, above the comparison list, states the source, the period the figures cover, and why those figures were kept.
 
 **Comparison list.** 「加入下方候选对比列表」 adds the current area to the table at the lower right: name, median, average, and low-to-high range. The same cell is not added twice. 「清空」 clears the table. The add button stays disabled until a cell is selected.
 
@@ -76,7 +76,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.22`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.31`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `m6`, `m9`, `m12`, `url`, `desc`, `shops`, `safety`, and `uscMin`. The top-level six figures are the trailing three months. `m6`, `m9`, and `m12` are the 6-, 9-, and 12-month windows. Batch 1 is filled; the rest are `null`. `ppsf` is dollars per square foot as published by Redfin, not per square meter. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -91,6 +91,26 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V4.31-Readme opening
+
+**Date:** 2026-11-01
+
+The opening of `README.md` is now a short introduction, and it includes the live map at https://hzcrayon.github.io/la-area-housing-map/ . The version-by-version history stays in this log. No sale figures or page behavior were changed.
+
+### V4.3-Panel follows its width
+
+**Date:** 2026-11-01
+
+The notes column can be dragged wider. On a wide screen the upper limit is about 1100 pixels, while about 280 pixels stay with the map. On a narrow screen the upper limit is about 480 pixels. Dragging to the minimum still stops there and does not hide the column.
+
+The write-up rearranges as the width changes. The four price cards stack in one column below about 360 pixels, stay in two columns through the middle, and sit in one row from about 640 pixels up. The price chart is redrawn to that width: the horizontal axis lengthens or shortens, and the height changes a little. At the wide size, the introduction sits beside errands, and safety sits beside the drive to USC. In a narrow column the sales count, price per square foot, and cell id stack vertically. No sale figures were changed.
+
+### V4.23-Source note moved down
+
+**Date:** 2026-11-01
+
+The source, period, and selection note moved from the header to the bottom of the detail write-up, just above the comparison list, in smaller type. The header keeps only the original subtitle. The wording is unchanged. No sale figures were changed.
 
 ### V4.22-Custom average cap
 

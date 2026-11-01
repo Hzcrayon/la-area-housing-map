@@ -1,30 +1,42 @@
 # LA Area Housing Map
 
-LA 周边住房成交价格交互地图，当前版本 **4.22**。
+大洛杉矶周边的住房成交地图。范围从 Santa Barbara 到南橙县沿海，一共 506 个网格。成交价来自 Redfin。
 
-地图覆盖大洛杉矶周边，向西北到 Santa Barbara，向东南到南橙县沿海，共 506 个网格。V2.8 把大洛杉矶里还偏粗的格子拆到邮编，并补上西侧、南侧、东南和东侧的空白。V2.9 把成交数据从页面代码里拆到 `housing_data.json`。V3.0 让右侧说明框可以收起，并把价格热力图分成 16 档。V3.1 把每个地区的说明改成区域简介，成交数字的文字说明改到房价旁边。V3.2 补上便利性、五档治安和到 USC 的大约车程，中位价上限改为 20 万美元起、每步 5 万美元。V3.3 在市中心到尔湾这一圈继续加密，并酌情补了周边邮编，成交价仍来自 Redfin。V3.4 改写了便利性，没有的店不再写上；成交跨度标尺改为绿到红；右侧说明栏可以拖动调整宽度，拖得过窄会收起。V3.5 为平均价、最低价和最高价各加一条上限滑杆，并可以按小于、高于或介于两个金额来搜这四项价格。V3.6 增加按每平方英尺均价着色的热力图，价格条件也可以筛这个数；说明栏拖到最窄就停住，不再自动收起。V4.0 为每个格子补上近 6、9、12 个月的空字段，并可以在顶栏切换周期；这三个周期的数字以后再填。V4.1 让中位价、最低价、最高价的「不限」可以点开输入自定义上限，并在说明栏画出四条价格随 3、6、9、12 个月变化的曲线；没写入的月份先空着。V4.2 把 506 个格子分成五批，并写入第 1 批（中城及紧邻，97 个）近 6、9、12 个月的 Redfin 成交。其余四批仍空着，留待以后逐批补。V4.21 在页眉副标题下写明四项成交价来自 Redfin、截止 2026-09-30 的有效期，以及平均价和高低价只在近 90 天样本合格时才写入。V4.22 让平均价上限的「不限」也可以点开输入自定义上限。点开区块可以跳到对应页面。版本名称写在 `DEVELOPER_LOG.zh.md`。英文说明在 `DEVELOPER_LOG.en.md`。
+**打开地图：** https://hzcrayon.github.io/la-area-housing-map/
+
+当前版本 **4.31**。
+
+## 地图上能做什么
+
+- 用颜色看成交中位价、平均价、最低价、最高价，或每平方英尺均价
+- 在近 3、6、9、12 个月之间切换
+- 按价格、治安和到 USC 的车程筛选
+- 点开一个格子，查看区域说明，并跳到它的 Redfin 页面
+
+每一版改了什么，写在 `DEVELOPER_LOG.zh.md`。英文版是 `DEVELOPER_LOG.en.md`。
+
+## 本地打开
+
+请用启动脚本打开，浏览器这样才能读到旁边的 `housing_data.json`。
+
+- Windows：双击 `start_windows.bat`，然后打开 http://localhost:8080
+- Mac：双击 `start_mac.command`。也可以在本目录执行 `python3 -m http.server 8080`，再打开 http://localhost:8080
 
 ## 项目文件
 
-- `index.html`: 网站主页面。标题、页眉徽章和 `application-version` 都是 `4.22`
-- `housing_data.json`: 506 个网格的成交数据库、区域简介、便利性、治安和到 USC 的车程。改价格、成交量或简介时改这个文件
-- `app.js`: 读取上面的 JSON，负责地图交互、四维指标热力渲染、免 API Key 底图切换
-- `start_windows.bat`: Windows 一键启动
-- `serve_local.ps1`: 没有 Python 时，由上面的 bat 调用
-- `start_mac.command`: macOS / Linux 一键启动
-- `DEVELOPER_LOG.zh.md`: 中文功能说明与版本记录。每条版本标题是 `V版本号-名称`
-- `DEVELOPER_LOG.en.md`: 同一份日志的英文版
+- `index.html`：页面。标题、页眉徽章和 `application-version` 都是 `4.31`
+- `housing_data.json`：506 个网格的成交价、简介、便利性、治安和到 USC 的车程
+- `app.js`：地图、热力图、筛选和底图
+- `start_windows.bat`：Windows 一键启动
+- `serve_local.ps1`：没有 Python 时，由上面的 bat 调用
+- `start_mac.command`：macOS / Linux 一键启动
+- `DEVELOPER_LOG.zh.md`：中文功能说明与版本记录
+- `DEVELOPER_LOG.en.md`：同一份日志的英文版
 
-## 本地运行
+## 更新在线地图
 
-成交数据在 `housing_data.json`，需要通过本地服务器打开，不要直接双击 `index.html`。
+在线地址就是上面的网址，内容和 `main` 分支是同一套文件。
 
-- Windows：双击 `start_windows.bat`，浏览器打开 `http://localhost:8080`
-- Mac：双击 `start_mac.command`。也可以在终端进入本目录，执行 `python3 -m http.server 8080`，然后打开 `http://localhost:8080`
-
-## 和网站同步
-
-仓库发布到 GitHub 之后，在仓库的 Settings → Pages 里把 Source 设为 **Deploy from a branch**，Branch 选 `main`，文件夹选 `/ (root)`，然后保存。网站地址是 `https://<你的用户名>.github.io/la-area-housing-map/`。页面内容和 `main` 分支是同一套文件。
-
-- **更新网站：** 在 GitHub Desktop 里提交，再点 Push origin。Pages 会用这次推送重新发布，通常一两分钟内能在网页上看到。
-- **获取网站上的版本：** 点 Fetch origin，有更新再点 Pull。拉下来的就是网站正在用的文件。
+1. 仓库 Settings → Pages：Source 选 **Deploy from a branch**，Branch 选 `main`，文件夹选 `/ (root)`。
+2. 提交后 Push origin。通常一两分钟内，https://hzcrayon.github.io/la-area-housing-map/ 会更新。
+3. 要拿回网站上的文件，先 Fetch origin，有更新再 Pull。

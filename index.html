@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v4.22</title>
-  <meta name="application-version" content="4.22" />
+  <title>LA Area Housing Map v4.31</title>
+  <meta name="application-version" content="4.31" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -149,7 +149,27 @@
       max-height: min(46vh, 340px);
       overflow: auto;
     }
-    #detail-panel { position: relative; width: 24rem; flex: 0 0 auto; max-width: 100%; }
+    #detail-panel {
+      position: relative;
+      width: 24rem;
+      flex: 0 0 auto;
+      max-width: 100%;
+      container-type: inline-size;
+    }
+    #detail-facts { display: grid; gap: 0 1.5rem; }
+    #price-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; }
+    #detail-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #price-chart-svg { width: 100%; height: 160px; display: block; }
+    @container (max-width: 359px) {
+      #price-cards { grid-template-columns: 1fr; }
+      #detail-meta { grid-template-columns: 1fr; }
+      #span-labels, #span-captions { justify-content: flex-start; }
+    }
+    @container (min-width: 640px) {
+      #price-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      #detail-facts { grid-template-columns: 1fr 1fr; }
+      #price-cards .price-figure { font-size: 1.25rem; }
+    }
     #panel-resizer {
       position: absolute;
       left: 0;
@@ -216,16 +236,11 @@
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.22</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.31</span>
         </h1>
         <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 506 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
     </div>
-    <p id="param-source" class="basis-full text-[11px] leading-relaxed text-slate-500 -mt-1">
-      <span class="block">来源：<a href="https://www.redfin.com/" target="_blank" rel="noopener noreferrer" class="text-indigo-300 underline underline-offset-2">Redfin</a> 住房市场页和已成交列表，全部住宅类型，没有手填。每个格子链到它自己的页面。</span>
-      <span class="block">有效期：中位价是截止 2026-09-30 的公布值；平均价、最低价、最高价取 2026-08-03 起返回的近 90 天成交。这是 2026-11-01 前后采下的快照，顶栏切换只是换看已保存的四项。</span>
-      <span class="block">取舍：中位价用各区同一期公布数，方便比较。平均价和高低价只在不少于 8 套、单价不低于 5 万美元、且中位价落在最低与最高之间时写入，否则留空。</span>
-    </p>
 
     <!-- Metric Selector -->
     <div class="flex flex-wrap items-center gap-2">
@@ -407,40 +422,50 @@
       <div id="zone-detail" class="p-4 border-b border-slate-800 overflow-y-auto flex-1">
         <div class="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-1" id="detail-region">点击任意地图小区块查看详情</div>
         <h2 class="text-lg font-bold text-white mb-1" id="detail-name">未选择区块</h2>
-        <div class="text-[11px] font-semibold text-indigo-400 mb-1">区域简介</div>
-        <p class="text-sm leading-relaxed text-slate-300 mb-3" id="detail-desc">点选地图上的区域，这里会显示该地的基本情况、人口、社区类型和主要去处。</p>
-        <div class="text-[11px] font-semibold text-indigo-400 mb-1">便利性</div>
-        <p class="text-sm leading-relaxed text-slate-300 mb-3" id="detail-shops">超市、CVS 和咖啡店会写在这里。</p>
-        <div class="text-[11px] font-semibold text-indigo-400 mb-1">周边治安</div>
-        <p class="text-sm leading-relaxed text-slate-300" id="detail-safety">—</p>
-        <p class="text-[11px] leading-relaxed text-slate-500 mb-3" id="detail-safety-note"></p>
-        <div class="text-[11px] font-semibold text-indigo-400 mb-1">到 USC 车程</div>
-        <p class="text-sm leading-relaxed text-slate-300 mb-4" id="detail-usc">有车时的大概白天车程。</p>
+        <div id="detail-facts" class="mb-4">
+          <div>
+            <div class="text-[11px] font-semibold text-indigo-400 mb-1">区域简介</div>
+            <p class="text-sm leading-relaxed text-slate-300 mb-3" id="detail-desc">点选地图上的区域，这里会显示该地的基本情况、人口、社区类型和主要去处。</p>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold text-indigo-400 mb-1">便利性</div>
+            <p class="text-sm leading-relaxed text-slate-300 mb-3" id="detail-shops">超市、CVS 和咖啡店会写在这里。</p>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold text-indigo-400 mb-1">周边治安</div>
+            <p class="text-sm leading-relaxed text-slate-300" id="detail-safety">—</p>
+            <p class="text-[11px] leading-relaxed text-slate-500 mb-3" id="detail-safety-note"></p>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold text-indigo-400 mb-1">到 USC 车程</div>
+            <p class="text-sm leading-relaxed text-slate-300 mb-3" id="detail-usc">有车时的大概白天车程。</p>
+          </div>
+        </div>
 
         <!-- 4 Core Parameters Cards -->
-        <div class="grid grid-cols-2 gap-2.5 mb-4">
+        <div id="price-cards" class="mb-4">
           <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
             <div class="text-[11px] text-slate-400">(a) 成交中位价 (Median)</div>
-            <div id="val-median" class="text-base font-extrabold text-indigo-400 mt-0.5 font-mono">--</div>
+            <div id="val-median" class="price-figure text-base font-extrabold text-indigo-400 mt-0.5 font-mono">--</div>
           </div>
           <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
             <div class="text-[11px] text-slate-400">(b) 成交平均值 (Average)</div>
-            <div id="val-avg" class="text-base font-extrabold text-emerald-400 mt-0.5 font-mono">--</div>
+            <div id="val-avg" class="price-figure text-base font-extrabold text-emerald-400 mt-0.5 font-mono">--</div>
           </div>
           <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
             <div class="text-[11px] text-slate-400">(c) 成交最低价 (Min)</div>
-            <div id="val-min" class="text-base font-extrabold text-sky-400 mt-0.5 font-mono">--</div>
+            <div id="val-min" class="price-figure text-base font-extrabold text-sky-400 mt-0.5 font-mono">--</div>
           </div>
           <div class="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3">
             <div class="text-[11px] text-slate-400">(d) 成交最高价 (Max)</div>
-            <div id="val-max" class="text-base font-extrabold text-rose-400 mt-0.5 font-mono">--</div>
+            <div id="val-max" class="price-figure text-base font-extrabold text-rose-400 mt-0.5 font-mono">--</div>
           </div>
         </div>
 
         <div class="mb-4">
           <div class="text-[11px] font-semibold text-indigo-400 mb-1">售价走势</div>
           <div id="price-chart" class="bg-slate-800/60 border border-slate-800 rounded-xl p-2">
-            <svg id="price-chart-svg" viewBox="0 0 320 176" class="w-full h-40 block" role="img" aria-label="3到12个月的最低价、最高价、平均价和中位价曲线"></svg>
+            <svg id="price-chart-svg" viewBox="0 0 320 176" role="img" aria-label="3到12个月的最低价、最高价、平均价和中位价曲线"></svg>
             <p id="price-chart-readout" class="mt-1 text-[11px] leading-relaxed text-slate-300 font-mono">把鼠标移到曲线上查看某一周期的价格。</p>
           </div>
           <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[10px]">
@@ -453,7 +478,7 @@
 
         <!-- Visual Price Span Bar -->
         <div class="bg-slate-800/60 border border-slate-800 rounded-xl p-3 mb-4">
-          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+          <div id="span-labels" class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[11px] text-slate-400 mb-1">
             <span>最低-最高成交跨度标尺</span>
             <span id="span-ratio" class="font-mono text-slate-300">均值/中位溢价: --</span>
           </div>
@@ -462,7 +487,7 @@
             <div id="marker-median" class="w-1 h-3 bg-white absolute top-0" style="left: 40%" title="中位价位置"></div>
             <div id="marker-avg" class="w-1 h-3 bg-emerald-300 absolute top-0" style="left: 50%" title="平均价位置"></div>
           </div>
-          <div class="flex justify-between text-[10px] font-mono text-slate-400">
+          <div id="span-captions" class="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[10px] font-mono text-slate-400">
             <span id="bar-min-lbl">Min: --</span>
             <span class="text-white">▎中位</span>
             <span class="text-emerald-300">▎均值</span>
@@ -471,7 +496,7 @@
         </div>
 
         <!-- Extra Metadata -->
-        <div class="grid grid-cols-3 gap-2 text-center bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/80 mb-3">
+        <div id="detail-meta" class="gap-2 text-center bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/80 mb-3">
           <div>
             <div id="sales-caption" class="text-[10px] text-slate-500">近三个月成交</div>
             <div id="val-sales" class="text-xs font-bold text-slate-200 mt-0.5">-- 套</div>
@@ -492,6 +517,11 @@
         <button id="add-compare-btn" class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition shadow disabled:opacity-40" disabled>
           + 加入下方候选对比列表
         </button>
+        <p id="param-source" class="mt-4 border-t border-slate-800 pt-2 text-[10px] leading-relaxed text-slate-500">
+          <span class="block">来源：<a href="https://www.redfin.com/" target="_blank" rel="noopener noreferrer" class="text-indigo-300 underline underline-offset-2">Redfin</a> 住房市场页和已成交列表，全部住宅类型，没有手填。每个格子链到它自己的页面。</span>
+          <span class="block">有效期：中位价是截止 2026-09-30 的公布值；平均价、最低价、最高价取 2026-08-03 起返回的近 90 天成交。这是 2026-11-01 前后采下的快照，顶栏切换只是换看已保存的四项。</span>
+          <span class="block">取舍：中位价用各区同一期公布数，方便比较。平均价和高低价只在不少于 8 套、单价不低于 5 万美元、且中位价落在最低与最高之间时写入，否则留空。</span>
+        </p>
       </div>
 
       <!-- Comparison List -->
