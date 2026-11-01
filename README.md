@@ -4,11 +4,11 @@
 
 **打开地图：** https://hzcrayon.github.io/la-area-housing-map/
 
-当前版本 **4.31**。
+当前版本 **4.41**。
 
 ## 地图上能做什么
 
-- 用颜色看成交中位价、平均价、最低价、最高价，或每平方英尺均价
+- 用颜色看成交中位价、平均价、最低价、最高价、每平方英尺均价，以及治安和到 USC 的车程
 - 在近 3、6、9、12 个月之间切换
 - 按价格、治安和到 USC 的车程筛选
 - 点开一个格子，查看区域说明，并跳到它的 Redfin 页面
@@ -24,7 +24,7 @@
 
 ## 项目文件
 
-- `index.html`：页面。标题、页眉徽章和 `application-version` 都是 `4.31`
+- `index.html`：页面。标题、页眉徽章和 `application-version` 都是 `4.41`
 - `housing_data.json`：506 个网格的成交价、简介、便利性、治安和到 USC 的车程
 - `app.js`：地图、热力图、筛选和底图
 - `start_windows.bat`：Windows 一键启动

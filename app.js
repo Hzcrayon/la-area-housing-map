@@ -4,6 +4,7 @@ let HOUSING_GRID_DATA = [];
 let currentMetric = 'median';
 let currentSpan = 3;
 let showLabels = true;
+let priceLabelsOn = true;
 let selectedZone = null;
 const compareList = [];
 
@@ -20,7 +21,9 @@ const metricLabels = {
   avg: '(b) 成交平均值',
   min: '(c) 成交最低价',
   max: '(d) 成交最高价',
-  ppsf: '(e) 每平方英尺均价'
+  ppsf: '(e) 每平方英尺均价',
+  safety: '(f) 治安',
+  usc: '(g) 到 USC 车程'
 };
 
 const SPAN_LABELS = { 3: '近三个月', 6: '近六个月', 9: '近九个月', 12: '近十二个月' };
@@ -225,10 +228,50 @@ const PPSF_STOPS = [
   { max: 1800, color: '#9333ea', ink: '#ffffff', label: '$1,500–1,800' },
   { max: Infinity, color: '#4c1d95', ink: '#ffffff', label: '≥$1,800' }
 ];
+const SAFETY_STOPS = [
+  { max: 2, color: '#166534', ink: '#ffffff', label: '1 非常安定' },
+  { max: 3, color: '#65a30d', ink: '#1a2e05', label: '2 相对安定' },
+  { max: 4, color: '#eab308', ink: '#1c1917', label: '3 中等' },
+  { max: 5, color: '#ea580c', ink: '#ffffff', label: '4 需要留意' },
+  { max: Infinity, color: '#b91c1c', ink: '#ffffff', label: '5 治安压力大' }
+];
+const USC_STOPS = [
+  { max: 16, color: '#0e7490', ink: '#ffffff', label: '≤15 分钟' },
+  { max: 31, color: '#0f766e', ink: '#ffffff', label: '16–30 分钟' },
+  { max: 46, color: '#3f6212', ink: '#ffffff', label: '31–45 分钟' },
+  { max: 61, color: '#84cc16', ink: '#1a2e05', label: '46–60 分钟' },
+  { max: 76, color: '#eab308', ink: '#1c1917', label: '61–75 分钟' },
+  { max: 91, color: '#f97316', ink: '#1c1917', label: '76–90 分钟' },
+  { max: 106, color: '#dc2626', ink: '#ffffff', label: '91–105 分钟' },
+  { max: Infinity, color: '#7e22ce', ink: '#ffffff', label: '≥106 分钟' }
+];
 const HEAT_EMPTY = { color: '#94a3b8', ink: '#0f172a', label: '无数据' };
 
+function isCategoryMetric(metric) {
+  return metric === 'safety' || metric === 'usc';
+}
+
 function activeHeatStops() {
-  return currentMetric === 'ppsf' ? PPSF_STOPS : HEAT_STOPS;
+  if (currentMetric === 'ppsf') return PPSF_STOPS;
+  if (currentMetric === 'safety') return SAFETY_STOPS;
+  if (currentMetric === 'usc') return USC_STOPS;
+  return HEAT_STOPS;
+}
+
+function metricValueOf(zone) {
+  if (currentMetric === 'safety') {
+    return zone.safety == null || !isFinite(zone.safety) ? null : zone.safety;
+  }
+  if (currentMetric === 'usc') {
+    return zone.uscMin == null || !isFinite(zone.uscMin) ? null : zone.uscMin;
+  }
+  return spanValue(zone, currentMetric);
+}
+
+function legendHeading() {
+  if (currentMetric === 'safety') return '治安地图图例';
+  if (currentMetric === 'usc') return '到 USC 车程图例';
+  return `价格热力图例 ${metricLabels[currentMetric]}`;
 }
 
 function getHeatColor(val) {
@@ -243,15 +286,26 @@ function getHeatColor(val) {
 function formatMetricShort(val) {
   if (val == null || !isFinite(val)) return '—';
   if (currentMetric === 'ppsf') return '$' + Math.round(val);
+  if (currentMetric === 'safety') return String(val);
+  if (currentMetric === 'usc') return val + '分';
   return formatShortUSD(val);
+}
+
+function labelIconSize() {
+  if (currentMetric === 'safety') return { size: [22, 18], anchor: [11, 9] };
+  if (currentMetric === 'usc') return { size: [46, 18], anchor: [23, 9] };
+  return { size: [54, 18], anchor: [27, 9] };
 }
 
 function renderLegend() {
   const scale = document.getElementById('legend-scale');
+  document.getElementById('legend-title').textContent = legendHeading();
   const chips = activeHeatStops().map(stop => (
     `<div class="legend-swatch" style="background:${stop.color};color:${stop.ink}">${stop.label}</div>`
   ));
-  chips.push(`<div class="legend-swatch span-2" style="background:${HEAT_EMPTY.color};color:${HEAT_EMPTY.ink}">${HEAT_EMPTY.label}</div>`);
+  if (!isCategoryMetric(currentMetric)) {
+    chips.push(`<div class="legend-swatch span-2" style="background:${HEAT_EMPTY.color};color:${HEAT_EMPTY.ink}">${HEAT_EMPTY.label}</div>`);
+  }
   scale.innerHTML = chips.join('');
 }
 
@@ -334,7 +388,7 @@ function renderGrid() {
     if (uscMax < 120 && zone.uscMin > uscMax) return;
     if (keyword && !zone.name.toLowerCase().includes(keyword) && !zone.id.toLowerCase().includes(keyword)) return;
 
-    const metricValue = spanValue(zone, currentMetric);
+    const metricValue = metricValueOf(zone);
     const color = getHeatColor(metricValue);
 
     const bounds = [
@@ -380,12 +434,13 @@ function renderGrid() {
     gridLayerGroup.addLayer(rect);
 
     if (showLabels) {
+      const iconBox = labelIconSize();
       const labelMarker = L.marker([zone.lat, zone.lng], {
         icon: L.divIcon({
           className: '',
           html: `<div class="grid-label">${formatMetricShort(metricValue)}</div>`,
-          iconSize: [54, 18],
-          iconAnchor: [27, 9]
+          iconSize: iconBox.size,
+          iconAnchor: iconBox.anchor
         }),
         interactive: false
       });
@@ -489,7 +544,14 @@ document.querySelectorAll('.metric-btn').forEach(btn => {
     });
     btn.className = 'metric-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 text-white transition';
     currentMetric = btn.dataset.metric;
-    document.getElementById('legend-title').textContent = `价格热力图例 ${metricLabels[currentMetric]}`;
+    const labelBox = document.getElementById('toggle-labels');
+    if (isCategoryMetric(currentMetric)) {
+      showLabels = false;
+      labelBox.checked = false;
+    } else {
+      showLabels = priceLabelsOn;
+      labelBox.checked = priceLabelsOn;
+    }
     renderLegend();
     renderGrid();
   });
@@ -712,6 +774,7 @@ document.getElementById('usc-slider').addEventListener('input', (e) => {
 document.getElementById('search-input').addEventListener('input', () => renderGrid());
 document.getElementById('toggle-labels').addEventListener('change', (e) => {
   showLabels = e.target.checked;
+  if (!isCategoryMetric(currentMetric)) priceLabelsOn = showLabels;
   renderGrid();
 });
 
@@ -789,18 +852,26 @@ document.getElementById('panel-toggle').addEventListener('click', () => {
 
 function panelLimits() {
   const viewport = window.innerWidth;
-  const narrow = viewport <= 800;
-  const min = narrow ? 260 : 300;
-  const max = narrow
-    ? Math.max(min, Math.min(480, viewport - 24))
-    : Math.max(min, Math.min(1100, viewport - 280));
+  const overlay = viewport <= 800;
+  const min = overlay ? 260 : 300;
+  const max = overlay
+    ? Math.max(min, viewport - 8)
+    : Math.max(min, Math.min(1280, viewport - 200));
   return { min: Math.min(min, max), max };
+}
+
+function panelLayoutName(width) {
+  if (width < 360) return 'stack';
+  if (width >= 560) return 'row';
+  return 'grid';
 }
 
 function applyPanelWidth(px) {
   const limits = panelLimits();
   const width = Math.max(limits.min, Math.min(limits.max, px));
-  document.getElementById('detail-panel').style.width = width + 'px';
+  const panel = document.getElementById('detail-panel');
+  panel.style.width = width + 'px';
+  panel.dataset.layout = panelLayoutName(width);
   try { localStorage.setItem('la-housing-panel-width', String(width)); } catch (e) {}
   if (document.getElementById('price-chart-svg')) renderPriceChart(selectedZone);
   return width;

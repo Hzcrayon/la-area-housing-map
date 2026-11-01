@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V4.31-Readme opening  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.31`)  
+**Current version:** V4.41-Wider notes column  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.41`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -22,11 +22,13 @@ On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail 
 
 **History window.** Next to the metric buttons are 3 months, 6 months, 9 months, and 12 months. The heat map, cell tags, detail prices, price caps, and price search all follow the selected window. Three months uses the figures already stored on each record. Batch 1 now has six-, nine-, and twelve-month figures. The other batches stay gray 「无数据」 with 「—」 in the detail panel. Later numbers can be filled into the same fields without another page change.
 
-**Price heat.** The header has five buttons: (a) median, (b) average, (c) minimum, (d) maximum, and (e) price per square foot. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. Chips sit in two columns. A cell with no figure for that metric is gray, labeled 「无数据」.
+**Map coloring.** The header has seven buttons: (a) median, (b) average, (c) minimum, (d) maximum, (e) price per square foot, (f) safety, and (g) drive time to USC. Choosing one repaints every cell. The legend title and chips follow that choice, in two columns. On a price map, a cell with no figure is gray, labeled 「无数据」. Safety and drive time ignore the month window. They use the safety tier and the daytime drive already stored on each cell.
 
 The four sale-price metrics share 16 dollar bins: under $400K, then $400–500K, $500–600K, $600–700K, $700–800K, $800–900K, $900K–$1.0M, $1.0–1.2M, $1.2–1.4M, $1.4–1.6M, $1.6–1.8M, $1.8–2.2M, $2.2–2.8M, $2.8–3.6M, $3.6–5.0M, and $5.0M or more. Colors run from cyan and green through yellow, orange, and red, then into purple.
 
 Price per square foot uses its own 16 bins, in dollars per square foot: under $300, $300–400, $400–450, $450–500, $500–550, $550–600, $600–650, $650–700, $700–750, $750–800, $800–900, $900–1,000, $1,000–1,200, $1,200–1,500, $1,500–1,800, and $1,800 or more. Published figures mostly sit between $400 and $800, so that band steps by $50. The low is about $205 and the high is about $1,950. The color order matches the sale-price heat. This is the single per-square-foot figure Redfin already published and the database already stores. It is not split into a median, average, low, and high of its own.
+
+Safety uses the five stored tiers: 1 very settled is dark green, 2 fairly settled is yellow-green, 3 typical is yellow, 4 use caution is orange, and 5 high pressure is red. Drive time steps by 15 minutes, from near and cyan to far and purple: 15 minutes or less, 16–30, 31–45, 46–60, 61–75, 76–90, 91–105, and 106 minutes or more. Stored drives run from about 8 minutes to 115.
 
 **Basemap switcher.** Four free basemaps sit at the map’s upper right. None of them needs an API key:
 
@@ -56,11 +58,11 @@ The active basemap button is indigo.
 
 **Search.** Typing part of a city name, neighborhood, or cell id, such as `Arcadia` or `SG09`, hides cells that do not match. Matching ignores case and checks both the name and the id.
 
-**Cell labels.** 「显示网格标签」 is on by default. Each cell then shows a dark tag such as `$1.95M`. Turning it off leaves only the colored cells.
+**Cell labels.** On a price map, 「显示网格标签」 starts checked. Each cell then shows a dark tag such as `$1.95M`. Turning it off leaves only the colored cells. Switching to safety or drive time clears the check, so those maps open without numbers. Checking it again shows the tier number or the minutes. Switching back to a price map restores that map’s previous check.
 
 **Hover, select, and popup.** Hovering a cell thickens its outline and deepens the fill. Clicking it loads that area in the side panel and turns the outline white. Clicking again opens a popup with all four prices.
 
-**Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). The column’s left edge can be dragged. On a wide screen the narrowest open width is about 300 pixels and the widest is about 1100 pixels, while leaving about 280 pixels for the map. On a narrow screen the limits are about 260 and 480 pixels, and the column stays inside the window. Dragging stops at the minimum width and does not close the column. The four price cards stack in one column below about 360 pixels, sit in two columns through the middle widths, and line up in one row from about 640 pixels up. At that wider size the introduction sits beside errands, and safety sits beside the drive to USC. In a narrow column the sales count, price per square foot, and cell id stack vertically. Only 「收起说明」 hides it. On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
+**Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). The column’s left edge can be dragged. On a wide screen the narrowest open width is about 300 pixels. The widest is the window width minus about 200 pixels, and never more than about 1280. On a narrow screen the column covers the map, from about 260 pixels up to nearly the whole window. Dragging stops at the minimum width and does not close the column. The four price cards stack in one column below about 360 pixels, sit in two columns through the middle widths, and line up in one row from about 560 pixels up. At that wider size the introduction sits beside errands, and safety sits beside the drive to USC. In a narrow column the sales count, price per square foot, and cell id stack vertically. Only 「收起说明」 hides it. On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
 
 **Price lines.** The detail panel includes a line chart. The horizontal axis is 3, 6, 9, and 12 months. The vertical axis is sale price. Four lines share the chart: low, high, average, and median. A month with no number has no dot and no invented segment. All four months stay on the chart no matter which window is selected in the header. The guide line starts on the selected window. Moving the pointer snaps the guide to the nearest month and lists that month’s four prices. Widening the column lengthens the horizontal axis, narrowing it shortens that axis, and the chart height changes a little with the width. An empty month reads 「—」.
 
@@ -76,7 +78,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.31`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.41`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `m6`, `m9`, `m12`, `url`, `desc`, `shops`, `safety`, and `uscMin`. The top-level six figures are the trailing three months. `m6`, `m9`, and `m12` are the 6-, 9-, and 12-month windows. Batch 1 is filled; the rest are `null`. `ppsf` is dollars per square foot as published by Redfin, not per square meter. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -91,6 +93,20 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V4.41-Wider notes column
+
+**Date:** 2026-11-01
+
+The previous cap was about 1100 pixels, while also reserving about 280 pixels for the map, and the four price cards became one row only from about 640 pixels. On a shorter window the drag stopped before that, so the cards stayed in two columns and the extra width was hard to see. At 800 pixels and below the cap was only about 480.
+
+On a wide screen the cap is now the window width minus about 200 pixels, up to about 1280. On a narrow screen the column covers the map and can be dragged to nearly the full window. The four cards line up in one row from about 560 pixels. No sale figures were changed.
+
+### V4.4-Safety and drive maps
+
+**Date:** 2026-11-01
+
+The header gained a safety map and a drive-time-to-USC map. Safety uses the five stored tiers. Drive time steps by 15 minutes, from cyan nearby to purple farther out. The legend title and chips follow the selected map. Both new maps open with cell labels off. Turning the labels on shows the tier or the minutes. Returning to a price map restores that map’s previous label check. The month window, price caps, and price search still apply only to prices. No sale figures were changed.
 
 ### V4.31-Readme opening
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v4.31</title>
-  <meta name="application-version" content="4.31" />
+  <title>LA Area Housing Map v4.41</title>
+  <meta name="application-version" content="4.41" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -160,16 +160,13 @@
     #price-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; }
     #detail-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     #price-chart-svg { width: 100%; height: 160px; display: block; }
-    @container (max-width: 359px) {
-      #price-cards { grid-template-columns: 1fr; }
-      #detail-meta { grid-template-columns: 1fr; }
-      #span-labels, #span-captions { justify-content: flex-start; }
-    }
-    @container (min-width: 640px) {
-      #price-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      #detail-facts { grid-template-columns: 1fr 1fr; }
-      #price-cards .price-figure { font-size: 1.25rem; }
-    }
+    #detail-panel[data-layout="stack"] #price-cards { grid-template-columns: 1fr; }
+    #detail-panel[data-layout="stack"] #detail-meta { grid-template-columns: 1fr; }
+    #detail-panel[data-layout="stack"] #span-labels,
+    #detail-panel[data-layout="stack"] #span-captions { justify-content: flex-start; }
+    #detail-panel[data-layout="row"] #price-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    #detail-panel[data-layout="row"] #detail-facts { grid-template-columns: 1fr 1fr; }
+    #detail-panel[data-layout="row"] #price-cards .price-figure { font-size: 1.25rem; }
     #panel-resizer {
       position: absolute;
       left: 0;
@@ -236,7 +233,7 @@
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.31</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.41</span>
         </h1>
         <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 506 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
@@ -251,6 +248,8 @@
         <button data-metric="min" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(c) 成交最低价</button>
         <button data-metric="max" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(d) 成交最高价</button>
         <button data-metric="ppsf" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(e) 每平方英尺均价</button>
+        <button data-metric="safety" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(f) 治安</button>
+        <button data-metric="usc" class="metric-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:text-white transition">(g) 到 USC 车程</button>
       </div>
       <span class="text-xs text-slate-400 ml-1">统计周期:</span>
       <div id="span-buttons" class="inline-flex rounded-lg bg-slate-800 p-1 border border-slate-700">
