@@ -1,4 +1,4 @@
-// LA Area Housing Map：Leaflet 免费底图切换 + 78个网格多边形渲染 + 四维参数动态联动
+// LA Area Housing Map：Leaflet 免费底图切换 + 113个网格多边形渲染 + 四维参数动态联动
 let currentMetric = 'median';
 let showLabels = true;
 let selectedZone = null;
@@ -183,8 +183,9 @@ function selectZone(zone) {
   document.getElementById('bar-min-lbl').textContent = `Min: ${formatShortUSD(zone.min)}`;
   document.getElementById('bar-max-lbl').textContent = `Max: ${formatShortUSD(zone.max)}`;
 
-  const diffPct = (((zone.avg - zone.median) / zone.median) * 100).toFixed(1);
-  document.getElementById('span-ratio').textContent = `均值较中位高 +${diffPct}%`;
+  const diffPct = ((zone.avg - zone.median) / zone.median) * 100;
+  const diffSign = diffPct >= 0 ? '+' : '';
+  document.getElementById('span-ratio').textContent = `均值较中位 ${diffSign}${diffPct.toFixed(1)}%`;
 
   const btn = document.getElementById('add-compare-btn');
   btn.disabled = false;

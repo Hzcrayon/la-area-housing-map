@@ -1,0 +1,109 @@
+# Developer Log
+
+**Project:** LA Area Housing Map  
+**Chinese name:** LA 周边住房地图
+
+**Current version:** V2.0-Southeast LA cells  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.0`)  
+**This file:** `DEVELOPER_LOG.en.md`  
+**Chinese log:** `DEVELOPER_LOG.zh.md`
+
+After every later change to features, data, or basemaps, add an entry at the top of section 3. The heading must be `Vversion-name`, for example `V1.31-Day and night aligned`. Do not use the date as the heading. Put the date on the line under the heading. Write the same version number into the Chinese log, with a Chinese name. Also set the version in `index.html` to the same number. The page title, the header `vX.Y` badge, and `application-version` must match the current version number recorded here. Do not start a third log.
+
+---
+
+## 1. Task and Features
+
+This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches northern Orange County to the southeast. It is divided into 113 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a trailing-90-day sales count, a price per square foot, and a short area note.
+
+On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SGV-09`). The map can be panned and zoomed from level 7 through 16.
+
+**Four price metrics.** The header has four buttons: (a) median, (b) average, (c) minimum, and (d) maximum. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. Color breaks are: under $900K green, $900K to $1.4M gold, $1.4M to $2.2M orange, $2.2M to $3.5M red, and above $3.5M violet.
+
+**Basemap switcher.** Four free basemaps sit at the map’s upper right. None of them needs an API key:
+
+- Clean streets: Esri World Street Map, with roads, place names, and terrain.
+- Dark heat: Esri’s dark gray canvas plus a label overlay. At the wide view, roads stay faint so the price colors read clearly; streets become easier to see when zoomed in.
+- OSM standard: the official OpenStreetMap street tiles.
+- Satellite terrain: Esri World Imagery.
+
+The active basemap button is indigo.
+
+**Day and night.** The header button names the mode currently on screen. The page opens in day mode: header, sidebar, legend, and popups are white and light gray, and the button reads 「白天模式」. One click turns those panels dark and changes the button to 「夜间模式」. Clicking again returns to the light interface and 「白天模式」. Price figures stay indigo, green, sky, and rose so they can still be told apart. Cell price tags in day mode are white chips with dark type. The map basemap itself does not invert. The choice is stored in the browser and kept on the next visit. V1.31 clears the night default that older versions saved automatically, so the first open after that update is day mode.
+
+**Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (10), LA Westside and coast (11), San Fernando Valley (10), Central LA (7), Southeast LA / Gateway Cities (35), San Gabriel Valley (14), South Bay (8), or northern Orange County / Irvine (8). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
+
+**Median cap.** The slider runs from $600K to $6M in $100K steps. The right end is labeled unlimited and keeps every cell. A lower cap hides cells whose median is above that cap.
+
+**Search.** Typing part of a city name, neighborhood, or cell id, such as `Arcadia` or `SGV-09`, hides cells that do not match. Matching ignores case and checks both the name and the id.
+
+**Cell labels.** 「显示网格标签」 is on by default. Each cell then shows a dark tag such as `$1.95M`. Turning it off leaves only the colored cells.
+
+**Hover, select, and popup.** Hovering a cell thickens its outline and deepens the fill. Clicking it loads that area in the side panel and turns the outline white. Clicking again opens a dark popup with all four prices.
+
+**Detail panel.** The panel shows the corridor, cell id, bilingual name, and description; four price cards; a bar from the low to the high, with a white mark for the median and a green mark for the average, plus how far the average sits above the median; and the 90-day sales count, price per square foot, and cell id.
+
+**Comparison list.** 「加入下方候选对比列表」 adds the current area to the table at the lower right: name, median, average, and low-to-high range. The same cell is not added twice. 「清空」 clears the table. The add button stays disabled until a cell is selected.
+
+---
+
+## 2. Code Structure
+
+This is a static site. There is no build step and no backend. The browser loads Leaflet, then `data.js`, then `app.js`.
+
+| File | Role |
+|---|---|
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.0`. The project name is LA Area Housing Map. |
+| `data.js` | Declares `HOUSING_GRID_DATA`, 113 records. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, and `desc`. Price edits and new cells belong in this file. Sources for the 35 V2.0 southeast Los Angeles records are in section 3. |
+| `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
+| `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it opens `index.html` directly. |
+| `start_mac.command` | macOS / Linux launcher. With `python3` it also uses port 8080. Otherwise it opens `index.html` directly. |
+| `README.md` | Short Chinese note for someone opening the project: file list and the two ways to run it. |
+| `DEVELOPER_LOG.zh.md` | The Chinese developer log. |
+| `DEVELOPER_LOG.en.md` | This English developer log. Both files keep the same version number. Each uses a name in its own language. |
+
+---
+
+## 3. Version History
+
+When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V2.0-Southeast LA cells
+
+**Date:** 2026-10-31
+
+Added 35 ZIP cells in southeast Los Angeles under the region `Southeast LA`, labeled 「东南洛杉矶 / 门户城市」 in the filter. The grid grew from 78 cells to 113. Coverage is East Los Angeles (90022, 90023, 90063), Boyle Heights (90033), Commerce (90040), Montebello (90640), Pico Rivera (90660), Whittier / West Whittier / South Whittier (90601, 90606, 90605), Santa Fe Springs (90670), Florence-Graham (90001), Huntington Park (90255), Maywood (90270), Bell / Bell Gardens / Cudahy (90201), South Gate (90280), Downey (90240, 90241, 90242), Watts (90002), Lynwood (90262), Compton (90220, 90221, 90222), Willowbrook (90059), Paramount (90723), Gardena (90247, 90248), Bellflower (90706), Norwalk (90650), La Mirada (90638), Carson (90745, 90746), and Lakewood (90712, 90713).
+
+None of the new figures were estimated by hand. Median sale price and median price per square foot come from the Redfin housing-market page for all home types, period ending 2026-09-30, which Redfin also describes as the three months ending September. `sales` is the sum of Redfin’s published homes-sold counts for July, August, and September 2026. Average, low, and high are calculated from `Closed Sale` records returned by Redfin’s map API on 2026-10-31 for the prior 90 days, after dropping any price under $50,000. That returned list is shorter than the quarterly sales count, so the low, high, and average describe those returned sales rather than every MLS transfer. A few ZIPs share an identical published median, including 90033 and 90063 at $674,802, and 90605, 90606, and 90201 at $824,758; those figures are copied as published. Each rectangle is the bounding box of that ZIP’s polygon on the Redfin page. Gardena 90247 overlaps the existing `SBY-05` cell, Torrance North & Gardena.
+
+### V1.31-Day and night aligned
+
+**Date:** 2026-10-31
+
+Fixed the reversed day and night modes. The page now opens light, and the button names the current mode: 「白天模式」 on the light theme and 「夜间模式」 on the dark theme. Clicking 「白天模式」 switches to dark and relabels the button 「夜间模式」; clicking again returns to light. The first open clears the night value older versions stored in `la-housing-theme`, so a refresh does not stay dark. Later choices are still stored under that same key.
+
+### V1.3-Renamed LA Area Housing Map
+
+**Date:** 2026-10-31
+
+The project is now named **LA Area Housing Map**. The page title, header, launchers, the headers of `data.js` and `app.js`, and the docs use that name. Map coverage, corridor names (including Santa Barbara), and the 78 cells then on the map were unchanged. This was the first version prepared for GitHub. After publishing, GitHub Pages serves the site from the `main` branch: pushing `main` updates the site, and pulling `main` retrieves the same files the site is built from.
+
+### V1.2-Day theme added
+
+**Date:** 2026-10-31
+
+Added a day theme. A header button switches modes, and night remains the default. Day mode lightens the header, sidebar, filters, legend, price popups, and cell tags. Map tiles stay as they are. The choice is stored under the `la-housing-theme` key in `localStorage`.
+
+### V1.1-Free basemaps without watermark
+
+**Date:** 2026-10-31
+
+Removed the “API KEY REQUIRED” watermark. In V1.0, Clean Streets and Dark Heat used CARTO raster tiles. Since 2026-09-25 those endpoints return only a watermark image when no API key is sent, so streets and labels never appear. Satellite was already Esri imagery and kept working. OSM Standard uses the official OpenStreetMap tiles and never needed a key.
+
+This version points Clean Streets at Esri World Street Map, and Dark Heat at Esri World Dark Gray Base plus the World Dark Gray Reference label layer. OSM and satellite keep their previous URLs. All four basemaps load in the browser with no signup and no key. The header note now says the basemaps are free and need no API key, and the page is marked v1.1.
+
+### V1.0-Initial interactive map
+
+**Date:** 2026-10-31
+
+First working release. An interactive map for comparing home prices: 78 cells from Los Angeles to Santa Barbara, four sale-price metrics, corridor filter, median cap, search, heat colors, a detail panel, and a comparison list. Basemaps were clean streets, dark heat, OSM standard, and satellite. Clean streets and dark heat still pointed at CARTO; V1.1 replaced those two.

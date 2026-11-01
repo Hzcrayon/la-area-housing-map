@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v1.31</title>
-  <meta name="application-version" content="1.31" />
+  <title>LA Area Housing Map v2.0</title>
+  <meta name="application-version" content="2.0" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -138,9 +138,9 @@
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v1.31</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v2.0</span>
         </h1>
-        <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 78 个高密度细分网格 · 四维成交价参数实时切换（免费底图，无需 API Key）</p>
+        <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 113 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
     </div>
 
@@ -163,12 +163,13 @@
     <!-- Filters & Search -->
     <div class="flex flex-wrap items-center gap-3">
       <select id="region-filter" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-        <option value="ALL">全部走廊区域 (78 网格)</option>
+        <option value="ALL">全部走廊区域 (113 网格)</option>
         <option value="Santa Barbara">Santa Barbara 区域</option>
         <option value="Ventura">Ventura / 101 走廊</option>
         <option value="LA Westside & Coast">LA 西区与海滨</option>
         <option value="San Fernando Valley">圣费尔南多谷 (SFV)</option>
         <option value="Central LA">LA 中心城区</option>
+        <option value="Southeast LA">东南洛杉矶 / 门户城市</option>
         <option value="San Gabriel Valley">圣盖博谷 (SGV 华人区)</option>
         <option value="South Bay">南湾 (South Bay)</option>
         <option value="Orange County North">北橙县 / 尔湾周边</option>
@@ -192,7 +193,7 @@
 
       <!-- Tile Style Switcher (Top Right) -->
       <div class="absolute top-3 right-3 z-10 bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl p-1.5 shadow-xl flex items-center gap-1">
-        <span class="text-[11px] text-slate-400 px-2">免费底图:</span>
+        <span class="text-[11px] text-slate-400 px-2">显示模式:</span>
         <button data-tile="voyager" class="tile-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white">清爽街景</button>
         <button data-tile="dark" class="tile-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800">深色热力</button>
         <button data-tile="osm" class="tile-btn px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800">OSM标准</button>
