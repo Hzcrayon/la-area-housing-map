@@ -24,9 +24,7 @@ LA 周边住房成交价格交互地图，当前版本 **1.3**。
 
 ## 和网站同步
 
-线上页面由 GitHub Pages 发布，内容和本仓库的 `main` 分支是同一套文件。
+仓库发布到 GitHub 之后，在仓库的 Settings → Pages 里把 Source 设为 **Deploy from a branch**，Branch 选 `main`，文件夹选 `/ (root)`，然后保存。网站地址是 `https://<你的用户名>.github.io/la-area-housing-map/`。页面内容和 `main` 分支是同一套文件。
 
-- **更新网站：** 改完代码后提交，并把 `main` 推到 GitHub。Pages 会用这次推送重新发布，通常一两分钟内能在网页上看到。
-- **获取网站上的版本：** 在本目录执行拉取（GitHub Desktop 里点 Fetch origin，有更新再点 Pull）。拉下来的就是网站正在用的文件。
-
-GitHub Desktop 打开本文件夹后，以后用 Push 推上去、用 Pull 取下来即可，不必再重新建仓库。
+- **更新网站：** 在 GitHub Desktop 里提交，再点 Push origin。Pages 会用这次推送重新发布，通常一两分钟内能在网页上看到。
+- **获取网站上的版本：** 点 Fetch origin，有更新再点 Pull。拉下来的就是网站正在用的文件。

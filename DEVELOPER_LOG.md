@@ -123,9 +123,9 @@ When the project changes again, add the new version at the top of this section. 
 
 ### 1.3 — 2026-10-31
 
-**中文。** 项目名称改为 **LA Area Housing Map**（LA 周边住房地图）。页面标题、页眉、启动脚本、`data.js` / `app.js` 文件头，以及本日志和 `README.md` 里的项目名都改成这个名字。地图范围、走廊名称（包括 Santa Barbara）和 78 个网格的数据没有改动。本版本是推到 GitHub 的第一版。网站由 GitHub Pages 从 `main` 分支发布：推送 `main` 会更新网站，拉取 `main` 会取回与网站相同的文件。
+**中文。** 项目名称改为 **LA Area Housing Map**（LA 周边住房地图）。页面标题、页眉、启动脚本、`data.js` / `app.js` 文件头，以及本日志和 `README.md` 里的项目名都改成这个名字。地图范围、走廊名称（包括 Santa Barbara）和 78 个网格的数据没有改动。本版本是准备推到 GitHub 的第一版。发布后用 GitHub Pages 从 `main` 分支提供网站：推送 `main` 会更新网站，拉取 `main` 会取回与网站相同的文件。
 
-**English.** The project is now named **LA Area Housing Map**. The page title, header, launchers, the headers of `data.js` and `app.js`, this log, and `README.md` use that name. Map coverage, corridor names (including Santa Barbara), and the 78 cells are unchanged. This is the first version pushed to GitHub. GitHub Pages publishes the site from the `main` branch: pushing `main` updates the site, and pulling `main` retrieves the same files the site is built from.
+**English.** The project is now named **LA Area Housing Map**. The page title, header, launchers, the headers of `data.js` and `app.js`, this log, and `README.md` use that name. Map coverage, corridor names (including Santa Barbara), and the 78 cells are unchanged. This is the first version prepared for GitHub. After publishing, GitHub Pages serves the site from the `main` branch: pushing `main` updates the site, and pulling `main` retrieves the same files the site is built from.
 
 ### 1.2 — 2026-10-31
 
