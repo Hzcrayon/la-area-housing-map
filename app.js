@@ -412,6 +412,73 @@ document.getElementById('panel-toggle').addEventListener('click', () => {
   setPanelOpen(open);
 });
 
+function panelLimits() {
+  const viewport = window.innerWidth;
+  const max = Math.max(280, Math.min(560, Math.round(viewport * 0.5)));
+  const min = viewport <= 800 ? 260 : 300;
+  return { min: Math.min(min, max), max };
+}
+
+function applyPanelWidth(px) {
+  const limits = panelLimits();
+  const width = Math.max(limits.min, Math.min(limits.max, px));
+  document.getElementById('detail-panel').style.width = width + 'px';
+  try { localStorage.setItem('la-housing-panel-width', String(width)); } catch (e) {}
+  return width;
+}
+
+let initialPanelWidth = 384;
+try {
+  const savedWidth = parseInt(localStorage.getItem('la-housing-panel-width'), 10);
+  if (savedWidth >= 260 && savedWidth <= 560) initialPanelWidth = savedWidth;
+} catch (e) {}
+applyPanelWidth(initialPanelWidth);
+window.addEventListener('resize', () => {
+  const workspace = document.getElementById('workspace');
+  if (workspace.classList.contains('panel-collapsed') || document.documentElement.classList.contains('panel-start-collapsed')) return;
+  applyPanelWidth(document.getElementById('detail-panel').getBoundingClientRect().width);
+});
+
+const panelResizer = document.getElementById('panel-resizer');
+panelResizer.addEventListener('pointerdown', (event) => {
+  if (event.button !== 0) return;
+  event.preventDefault();
+  try { panelResizer.setPointerCapture(event.pointerId); } catch (e) {}
+  panelResizer.classList.add('dragging');
+  const startX = event.clientX;
+  const startWidth = document.getElementById('detail-panel').getBoundingClientRect().width;
+  const previousUserSelect = document.body.style.userSelect;
+  document.body.style.userSelect = 'none';
+
+  function stopDrag() {
+    panelResizer.removeEventListener('pointermove', onMove);
+    panelResizer.removeEventListener('pointerup', stopDrag);
+    panelResizer.removeEventListener('pointercancel', stopDrag);
+    panelResizer.classList.remove('dragging');
+    document.body.style.userSelect = previousUserSelect;
+    if (panelResizer.hasPointerCapture(event.pointerId)) {
+      panelResizer.releasePointerCapture(event.pointerId);
+    }
+    refreshMapSize();
+  }
+
+  function onMove(moveEvent) {
+    const limits = panelLimits();
+    const next = startWidth + (startX - moveEvent.clientX);
+    if (next < limits.min) {
+      stopDrag();
+      setPanelOpen(false);
+      return;
+    }
+    applyPanelWidth(Math.min(limits.max, next));
+    refreshMapSize();
+  }
+
+  panelResizer.addEventListener('pointermove', onMove);
+  panelResizer.addEventListener('pointerup', stopDrag);
+  panelResizer.addEventListener('pointercancel', stopDrag);
+});
+
 renderLegend();
 
 async function loadHousingData() {
