@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V3.4-Errands and the notes panel  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.4`)  
+**Current version:** V3.5-Price caps and price search  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.5`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -33,7 +33,14 @@ The active basemap button is indigo.
 
 **Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (21), LA Westside and coast (26), Southwest LA (17), Beverly Hills (3), Culver City (2), Inglewood (5), San Fernando Valley (56), Burbank (5), Glendale (10), Pasadena (8), Altadena (1), Central LA (51), Downtown LA (6), USC (8), Southeast LA / Gateway Cities (41), San Gabriel Valley (39), South Bay (13), Torrance (6), Long Beach (22), Cerritos (1), Cypress (1), Buena Park (2), Costa Mesa (2), Tustin (2), Yorba Linda (2), Newport Beach (7), Fullerton (4), Brea (2), Anaheim (8), Garden Grove (5), Santa Ana (6), Huntington Beach (4), Irvine (9), Pomona (3), Ontario (3), Fontana (3), San Bernardino (7), Riverside (7), Moreno Valley (4), Corona (5), the Inland Empire interior (22), Santa Clarita (10), Orange and neighbors (8), South OC (20), or the smaller North OC cities (9). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
 
-**Median cap.** The slider runs from $200K to $6M in $50K steps. The right end is labeled unlimited and keeps every cell. A lower cap hides cells whose median is above that cap.
+**Price caps.** The header has four upper-limit sliders. The right end of each is unlimited. A lower setting hides cells whose figure for that metric is above the cap, and also hides cells that do not publish that figure.
+
+- Median: $200K to $6M, in $50K steps.
+- Average: $400K to $10M, in $100K steps. Published averages run from about $408K to $10.32M, and nearly all of them are under $10M.
+- Low: $50K to $3M, in $50K steps. Published lows run from $50K to about $2.86M.
+- High: $500K to $20M, in $250K steps. Published highs start around $695K, most sit in the low millions, and a few estate sales reach above $50M, so the slider stops at $20M and anything higher stays available at the unlimited end.
+
+**Price search.** A separate control can test the median, average, low, or high: less than, greater than, or between two amounts. Less than and greater than do not include an equal value. Between includes both ends, and the two amounts are ordered automatically if they are entered backwards. An empty amount is ignored. Choosing unlimited turns this search off. It applies together with the four caps. A cell with no published figure for the chosen metric does not pass a numeric condition.
 
 **Safety tiers.** The header can filter five relative tiers: 1 very settled, 2 fairly settled, 3 typical, 4 use caution, and 5 high pressure. It can also keep only tiers 1–2, or 1–3. The tier is a reading of years of news plus publicly reported police patterns. It is not an official ranking, and it does not describe every block.
 
@@ -59,7 +66,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.4`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.5`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, `desc`, `shops`, `safety`, and `uscMin`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -74,6 +81,14 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V3.5-Price caps and price search
+
+**Date:** 2026-11-01
+
+The header now caps the average, the low, and the high as well as the median. The ranges and steps follow the 506 published figures: average from $400K to $10M in $100K steps, low from $50K to $3M in $50K steps, and high from $500K to $20M in $250K steps. The right end of each slider is unlimited.
+
+A price search can also test any of the four figures: less than, greater than, or between two amounts. Less than and greater than exclude an equal value. Between includes both ends. The search and the four caps apply together. If a figure is unpublished, the cell is hidden once that cap leaves unlimited or the price search is on. The sale numbers themselves are unchanged.
 
 ### V3.4-Errands and the notes panel
 

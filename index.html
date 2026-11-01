@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v3.4</title>
-  <meta name="application-version" content="3.4" />
+  <title>LA Area Housing Map v3.5</title>
+  <meta name="application-version" content="3.5" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -173,6 +173,14 @@
     #panel-resizer.dragging::after { background: #6366f1; }
     #map-tools { z-index: 40; }
     @media (max-width: 800px) {
+      #price-caps {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        width: 100%;
+      }
+    }
+    @media (max-width: 800px) {
       #detail-panel {
         position: absolute;
         top: 0;
@@ -198,7 +206,7 @@
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v3.4</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v3.5</span>
         </h1>
         <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 506 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
@@ -272,10 +280,46 @@
         <option value="North OC">北橙县小城 (North OC)</option>
       </select>
 
+      <div id="price-caps" class="contents">
       <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
         <span class="text-xs text-slate-400">中位价上限:</span>
-        <input id="budget-slider" type="range" min="200000" max="6000000" step="50000" value="6000000" class="w-24 accent-indigo-500 cursor-pointer" />
-        <span id="budget-label" class="text-xs font-mono font-semibold text-indigo-400">不限</span>
+        <input id="budget-slider" data-field="median" type="range" min="200000" max="6000000" step="50000" value="6000000" class="price-cap w-24 accent-indigo-500 cursor-pointer" />
+        <span id="budget-label" class="text-xs font-mono font-semibold text-indigo-400 w-16 text-right">不限</span>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
+        <span class="text-xs text-slate-400">平均价上限:</span>
+        <input id="avg-cap-slider" data-field="avg" type="range" min="400000" max="10000000" step="100000" value="10000000" class="price-cap w-24 accent-emerald-500 cursor-pointer" />
+        <span id="avg-cap-label" class="text-xs font-mono font-semibold text-emerald-400 w-16 text-right">不限</span>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
+        <span class="text-xs text-slate-400">最低价上限:</span>
+        <input id="min-cap-slider" data-field="min" type="range" min="50000" max="3000000" step="50000" value="3000000" class="price-cap w-24 accent-sky-500 cursor-pointer" />
+        <span id="min-cap-label" class="text-xs font-mono font-semibold text-sky-400 w-16 text-right">不限</span>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
+        <span class="text-xs text-slate-400">最高价上限:</span>
+        <input id="max-cap-slider" data-field="max" type="range" min="500000" max="20000000" step="250000" value="20000000" class="price-cap w-24 accent-rose-500 cursor-pointer" />
+        <span id="max-cap-label" class="text-xs font-mono font-semibold text-rose-400 w-16 text-right">不限</span>
+      </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
+        <span class="text-xs text-slate-400">价格条件:</span>
+        <select id="price-query-metric" class="bg-slate-900 border border-slate-700 text-xs rounded px-1.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+          <option value="median">中位价</option>
+          <option value="avg">平均值</option>
+          <option value="min">最低价</option>
+          <option value="max">最高价</option>
+        </select>
+        <select id="price-query-mode" class="bg-slate-900 border border-slate-700 text-xs rounded px-1.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+          <option value="off">不限</option>
+          <option value="lt">小于</option>
+          <option value="gt">高于</option>
+          <option value="between">介于</option>
+        </select>
+        <input id="price-query-a" type="number" min="0" step="10000" placeholder="金额" class="hidden w-24 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500" />
+        <span id="price-query-and" class="hidden text-xs text-slate-400">到</span>
+        <input id="price-query-b" type="number" min="0" step="10000" placeholder="金额" class="hidden w-24 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500" />
       </div>
 
       <select id="safety-filter" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500">

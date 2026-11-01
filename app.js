@@ -136,14 +136,13 @@ function renderGrid() {
   labelLayerGroup.clearLayers();
 
   const regionVal = document.getElementById('region-filter').value;
-  const maxBudget = parseInt(document.getElementById('budget-slider').value, 10);
   const safetyVal = document.getElementById('safety-filter').value;
   const uscMax = parseInt(document.getElementById('usc-slider').value, 10);
   const keyword = document.getElementById('search-input').value.trim().toLowerCase();
 
   HOUSING_GRID_DATA.forEach(zone => {
     if (regionVal !== 'ALL' && zone.region !== regionVal) return;
-    if (maxBudget < 6000000 && zone.median > maxBudget) return;
+    if (priceCapHides(zone) || priceQueryHides(zone)) return;
     if (safetyVal !== 'ALL') {
       if (safetyVal.indexOf('LTE') === 0) {
         if (zone.safety > parseInt(safetyVal.slice(3), 10)) return;
@@ -321,11 +320,92 @@ document.getElementById('region-filter').addEventListener('change', (e) => {
   }
 });
 
-document.getElementById('budget-slider').addEventListener('input', (e) => {
-  const val = parseInt(e.target.value, 10);
-  document.getElementById('budget-label').textContent = val >= 6000000 ? '不限' : formatShortUSD(val);
-  renderGrid();
+const PRICE_CAPS = {
+  median: { slider: 'budget-slider', label: 'budget-label', max: 6000000 },
+  avg: { slider: 'avg-cap-slider', label: 'avg-cap-label', max: 10000000 },
+  min: { slider: 'min-cap-slider', label: 'min-cap-label', max: 3000000 },
+  max: { slider: 'max-cap-slider', label: 'max-cap-label', max: 20000000 }
+};
+
+function readCap(field) {
+  const spec = PRICE_CAPS[field];
+  return parseInt(document.getElementById(spec.slider).value, 10);
+}
+
+function priceCapHides(zone) {
+  const fields = ['median', 'avg', 'min', 'max'];
+  for (let i = 0; i < fields.length; i += 1) {
+    const field = fields[i];
+    const spec = PRICE_CAPS[field];
+    const cap = readCap(field);
+    if (cap >= spec.max) continue;
+    const price = zone[field];
+    if (price == null || !isFinite(price) || price > cap) return true;
+  }
+  return false;
+}
+
+function readQueryBound(id) {
+  const raw = document.getElementById(id).value.trim();
+  if (raw === '') return null;
+  const num = Number(raw);
+  return isFinite(num) ? num : null;
+}
+
+function priceQueryHides(zone) {
+  const mode = document.getElementById('price-query-mode').value;
+  if (mode === 'off') return false;
+  const field = document.getElementById('price-query-metric').value;
+  const price = zone[field];
+  if (price == null || !isFinite(price)) return true;
+  const left = readQueryBound('price-query-a');
+  const right = readQueryBound('price-query-b');
+  if (mode === 'lt') return left != null && !(price < left);
+  if (mode === 'gt') return left != null && !(price > left);
+  if (mode === 'between') {
+    if (left == null && right == null) return false;
+    let lo = left;
+    let hi = right;
+    if (lo != null && hi != null && lo > hi) {
+      const swap = lo;
+      lo = hi;
+      hi = swap;
+    }
+    if (lo != null && price < lo) return true;
+    if (hi != null && price > hi) return true;
+  }
+  return false;
+}
+
+function syncPriceQueryInputs() {
+  const mode = document.getElementById('price-query-mode').value;
+  const showA = mode === 'lt' || mode === 'gt' || mode === 'between';
+  const showB = mode === 'between';
+  document.getElementById('price-query-a').classList.toggle('hidden', !showA);
+  document.getElementById('price-query-b').classList.toggle('hidden', !showB);
+  document.getElementById('price-query-and').classList.toggle('hidden', !showB);
+}
+
+document.querySelectorAll('.price-cap').forEach((slider) => {
+  slider.addEventListener('input', () => {
+    const field = slider.getAttribute('data-field');
+    const spec = PRICE_CAPS[field];
+    const val = parseInt(slider.value, 10);
+    document.getElementById(spec.label).textContent = val >= spec.max ? '不限' : formatShortUSD(val);
+    renderGrid();
+  });
 });
+
+['price-query-metric', 'price-query-mode'].forEach((id) => {
+  document.getElementById(id).addEventListener('change', () => {
+    syncPriceQueryInputs();
+    renderGrid();
+  });
+});
+['price-query-a', 'price-query-b'].forEach((id) => {
+  document.getElementById(id).addEventListener('input', () => renderGrid());
+});
+syncPriceQueryInputs();
 
 document.getElementById('safety-filter').addEventListener('change', () => renderGrid());
 
