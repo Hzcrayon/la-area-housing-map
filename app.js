@@ -1,4 +1,4 @@
-// LA Area Housing Map：Leaflet 免费底图切换 + 331个网格多边形渲染 + 四维参数动态联动
+// LA Area Housing Map：Leaflet 免费底图切换 + 506个网格多边形渲染 + 四维参数动态联动
 // 成交数据不写在这里，启动时从 housing_data.json 读入。
 let HOUSING_GRID_DATA = [];
 let currentMetric = 'median';

@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V3.2-Errands, safety, and drive time  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.2`)  
+**Current version:** V3.3-Denser central grid  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.3`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -14,7 +14,7 @@ After every later change to features, data, or basemaps, add an entry at the top
 
 ## 1. Task and Features
 
-This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches northern Orange County to the southeast. It is divided into 331 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a trailing-90-day sales count, a price per square foot, and a short area note.
+This site shows closed-home prices from central Los Angeles out to Santa Barbara. The map is centered on Los Angeles, reaches Santa Barbara to the northwest, and reaches the south Orange County coast to the southeast. It is divided into 506 rectangular cells. Thirty-five of them are the southeast Los Angeles ZIP cells added in V2.0. Each cell carries a median sale price, an average sale price, a low, a high, a trailing-90-day sales count, a price per square foot, and a short area note.
 
 On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SG09`, ZIP 91006). The map can be panned and zoomed from level 7 through 16.
 
@@ -31,7 +31,7 @@ The active basemap button is indigo.
 
 **Day and night.** The header button names the mode currently on screen. The page opens in day mode: header, sidebar, legend, and popups are white and light gray, and the button reads 「白天模式」. One click turns those panels dark and changes the button to 「夜间模式」. Clicking again returns to the light interface and 「白天模式」. Price figures stay indigo, green, sky, and rose so they can still be told apart. Cell price tags in day mode are white chips with dark type. The map basemap itself does not invert. The choice is stored in the browser and kept on the next visit. V1.31 clears the night default that older versions saved automatically, so the first open after that update is day mode.
 
-**Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (10), LA Westside and coast (13), Southwest LA (11), Beverly Hills (3), Culver City (2), Inglewood (5), San Fernando Valley (35), Burbank (5), Glendale (9), Pasadena (6), Altadena (1), Central LA (17), Downtown LA (6), USC (6), Southeast LA / Gateway Cities (38), San Gabriel Valley (32), South Bay (12), Torrance (5), Long Beach (11), Cerritos (1), Cypress (1), Buena Park (2), Costa Mesa (2), Tustin (2), Yorba Linda (2), Newport Beach (3), Fullerton (4), Brea (2), Anaheim (7), Garden Grove (5), Santa Ana (6), Huntington Beach (4), Irvine (8), Pomona (3), Ontario (3), Fontana (3), San Bernardino (7), Riverside (7), Moreno Valley (4), Corona (5), or the Inland Empire interior (13). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
+**Corridor filter.** The header menu can limit the map to one corridor: Santa Barbara (10 cells), Ventura / US-101 (21), LA Westside and coast (26), Southwest LA (17), Beverly Hills (3), Culver City (2), Inglewood (5), San Fernando Valley (56), Burbank (5), Glendale (10), Pasadena (8), Altadena (1), Central LA (51), Downtown LA (6), USC (8), Southeast LA / Gateway Cities (41), San Gabriel Valley (39), South Bay (13), Torrance (6), Long Beach (22), Cerritos (1), Cypress (1), Buena Park (2), Costa Mesa (2), Tustin (2), Yorba Linda (2), Newport Beach (7), Fullerton (4), Brea (2), Anaheim (8), Garden Grove (5), Santa Ana (6), Huntington Beach (4), Irvine (9), Pomona (3), Ontario (3), Fontana (3), San Bernardino (7), Riverside (7), Moreno Valley (4), Corona (5), the Inland Empire interior (22), Santa Clarita (10), Orange and neighbors (8), South OC (20), or the smaller North OC cities (9). The map then flies to that corridor at zoom 10. Choosing all corridors returns to the original wide view.
 
 **Median cap.** The slider runs from $200K to $6M in $50K steps. The right end is labeled unlimited and keeps every cell. A lower cap hides cells whose median is above that cap.
 
@@ -59,8 +59,8 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.2`. The project name is LA Area Housing Map. |
-| `housing_data.json` | The sales database, 331 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.3`. The project name is LA Area Housing Map. |
+| `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, `desc`, `shops`, `safety`, and `uscMin`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
 | `serve_local.ps1` | Local server used when Python is missing. It also uses port 8080. |
@@ -74,6 +74,18 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V3.3-Denser central grid
+
+**Date:** 2026-11-01
+
+175 cells were added to the existing 331, for 506 in total. The new cells sit mainly inside the disk from downtown Los Angeles out to Irvine: Hollywood, East Hollywood, Westlake, Lincoln Heights, El Sereno, Palms, Sawtelle, Century City, plus Echo Park, Silver Lake, Los Feliz, Koreatown, Boyle Heights, Westwood, Venice, and the Long Beach neighborhoods. A smaller set was added around the edge: Santa Clarita, the Conejo Valley, Simi Valley, Camarillo, Redlands, Highland, Orange, and south Orange County down to San Clemente.
+
+Prices still come only from figures Redfin publishes. Median, price per square foot, and the trailing-three-month sales count use the 2026-09-30 period. Average, low, and high are stored only when the returned sales from the last 90 days are a large enough sample and the median falls between the low and the high. Neighborhoods with no monthly series for that period were left out. Autocomplete hits in North Carolina, Northern California, San Diego, and the Lake Tahoe area were dropped.
+
+Each new cell uses the same fields as the others: an introduction, errands, a five-tier safety reading, and a daytime drive to USC. The safety tier is still a relative reading of news and publicly reported police patterns, not an official ranking. A neighborhood cell may sit inside an existing ZIP cell, which is how the center of the map gets denser. No older cell was removed, and no older price was changed. ZIPs such as Newhall, Castaic, Topanga, and Laguna Beach still use the real bounding-box half-extent, so some of those cells are large.
+
+The filter gained Santa Clarita, Orange and its neighbors, South OC, and the smaller North OC cities.
 
 ### V3.2-Errands, safety, and drive time
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v3.2</title>
-  <meta name="application-version" content="3.2" />
+  <title>LA Area Housing Map v3.3</title>
+  <meta name="application-version" content="3.3" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -174,9 +174,9 @@
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v3.2</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v3.3</span>
         </h1>
-        <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 331 个高密度细分网格 · 四维成交价参数实时切换</p>
+        <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 506 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
     </div>
 
@@ -199,7 +199,7 @@
     <!-- Filters & Search -->
     <div class="flex flex-wrap items-center gap-3">
       <select id="region-filter" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-        <option value="ALL">全部走廊区域 (331 网格)</option>
+        <option value="ALL">全部走廊区域 (506 网格)</option>
         <option value="Santa Barbara">Santa Barbara 区域</option>
         <option value="Ventura">Ventura / 101 走廊</option>
         <option value="LA Westside & Coast">LA 西区与海滨</option>
@@ -242,6 +242,10 @@
         <option value="Moreno Valley">莫雷诺谷 (Moreno Valley)</option>
         <option value="Corona">科罗纳 (Corona)</option>
         <option value="Inland Empire">内陆帝国腹地</option>
+        <option value="Santa Clarita">圣克拉丽塔 (Santa Clarita)</option>
+        <option value="Orange">橙市及周边 (Orange)</option>
+        <option value="South OC">南橙县 (South OC)</option>
+        <option value="North OC">北橙县小城 (North OC)</option>
       </select>
 
       <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1">
