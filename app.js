@@ -26,13 +26,42 @@ function formatShortUSD(num) {
   return '$' + Math.round(num / 1000) + 'K';
 }
 
+// 四项价格共用这一套金额分档。中位价大多落在 40 万到 180 万美元，所以这一段分得更细。
+const HEAT_STOPS = [
+  { max: 400000, color: '#075985', ink: '#ffffff', label: '<$400K' },
+  { max: 500000, color: '#0891b2', ink: '#ffffff', label: '$400–500K' },
+  { max: 600000, color: '#0f766e', ink: '#ffffff', label: '$500–600K' },
+  { max: 700000, color: '#059669', ink: '#ffffff', label: '$600–700K' },
+  { max: 800000, color: '#3f6212', ink: '#ffffff', label: '$700–800K' },
+  { max: 900000, color: '#84cc16', ink: '#1a2e05', label: '$800–900K' },
+  { max: 1000000, color: '#eab308', ink: '#1c1917', label: '$900K–1.0M' },
+  { max: 1200000, color: '#9a3412', ink: '#ffffff', label: '$1.0–1.2M' },
+  { max: 1400000, color: '#fb923c', ink: '#1c1917', label: '$1.2–1.4M' },
+  { max: 1600000, color: '#dc2626', ink: '#ffffff', label: '$1.4–1.6M' },
+  { max: 1800000, color: '#e11d48', ink: '#ffffff', label: '$1.6–1.8M' },
+  { max: 2200000, color: '#db2777', ink: '#ffffff', label: '$1.8–2.2M' },
+  { max: 2800000, color: '#c026d3', ink: '#ffffff', label: '$2.2–2.8M' },
+  { max: 3600000, color: '#9333ea', ink: '#ffffff', label: '$2.8–3.6M' },
+  { max: 5000000, color: '#6d28d9', ink: '#ffffff', label: '$3.6–5.0M' },
+  { max: Infinity, color: '#4c1d95', ink: '#ffffff', label: '≥$5.0M' }
+];
+const HEAT_EMPTY = { color: '#94a3b8', ink: '#0f172a', label: '无数据' };
+
 function getHeatColor(val) {
-  if (val == null || !isFinite(val)) return '#94a3b8';
-  if (val < 900000) return '#22c55e';      // 翠绿 < $900K
-  if (val < 1400000) return '#eab308';     // 金黄 $900K - $1.4M
-  if (val < 2200000) return '#f97316';     // 橙色 $1.4M - $2.2M
-  if (val < 3500000) return '#ef4444';     // 红色 $2.2M - $3.5M
-  return '#a855f7';                        // 紫罗兰 > $3.5M
+  if (val == null || !isFinite(val)) return HEAT_EMPTY.color;
+  for (let i = 0; i < HEAT_STOPS.length; i += 1) {
+    if (val < HEAT_STOPS[i].max) return HEAT_STOPS[i].color;
+  }
+  return HEAT_STOPS[HEAT_STOPS.length - 1].color;
+}
+
+function renderLegend() {
+  const scale = document.getElementById('legend-scale');
+  const chips = HEAT_STOPS.map(stop => (
+    `<div class="legend-swatch" style="background:${stop.color};color:${stop.ink}">${stop.label}</div>`
+  ));
+  chips.push(`<div class="legend-swatch span-2" style="background:${HEAT_EMPTY.color};color:${HEAT_EMPTY.ink}">${HEAT_EMPTY.label}</div>`);
+  scale.innerHTML = chips.join('');
 }
 
 // 初始化地图 (视野中心涵盖 LA 至 Santa Barbara)
@@ -119,7 +148,7 @@ function renderGrid() {
       color: selectedZone && selectedZone.id === zone.id ? '#ffffff' : color,
       weight: selectedZone && selectedZone.id === zone.id ? 3 : 1.5,
       fillColor: color,
-      fillOpacity: 0.52
+      fillOpacity: 0.62
     });
 
     const popupHTML = `
@@ -139,11 +168,11 @@ function renderGrid() {
     rect.bindPopup(popupHTML);
 
     rect.on('mouseover', function () {
-      this.setStyle({ weight: 3, fillOpacity: 0.75 });
+      this.setStyle({ weight: 3, fillOpacity: 0.84 });
     });
     rect.on('mouseout', function () {
       const isSelected = selectedZone && selectedZone.id === zone.id;
-      this.setStyle({ weight: isSelected ? 3 : 1.5, fillOpacity: 0.52 });
+      this.setStyle({ weight: isSelected ? 3 : 1.5, fillOpacity: 0.62 });
     });
     rect.on('click', function () {
       selectZone(zone);
@@ -222,7 +251,7 @@ document.querySelectorAll('.metric-btn').forEach(btn => {
     });
     btn.className = 'metric-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 text-white transition';
     currentMetric = btn.dataset.metric;
-    document.getElementById('legend-title').textContent = `价格热力图例 (${metricLabels[currentMetric]})`;
+    document.getElementById('legend-title').textContent = `价格热力图例 ${metricLabels[currentMetric]}`;
     renderGrid();
   });
 });
@@ -315,6 +344,31 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 });
 
 applyTheme(document.documentElement.getAttribute('data-theme') === 'day' ? 'day' : 'night');
+
+function refreshMapSize() {
+  requestAnimationFrame(() => {
+    map.invalidateSize();
+    setTimeout(() => map.invalidateSize(), 60);
+  });
+}
+
+function setPanelOpen(open) {
+  document.getElementById('workspace').classList.toggle('panel-collapsed', !open);
+  document.documentElement.classList.remove('panel-start-collapsed');
+  const btn = document.getElementById('panel-toggle');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  document.getElementById('panel-toggle-label').textContent = open ? '收起说明' : '显示说明';
+  refreshMapSize();
+}
+
+const panelStartsClosed = document.documentElement.classList.contains('panel-start-collapsed');
+setPanelOpen(!panelStartsClosed);
+document.getElementById('panel-toggle').addEventListener('click', () => {
+  const open = document.getElementById('workspace').classList.contains('panel-collapsed');
+  setPanelOpen(open);
+});
+
+renderLegend();
 
 async function loadHousingData() {
   const response = await fetch('housing_data.json');

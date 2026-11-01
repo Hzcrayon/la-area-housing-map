@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V2.9-Data separated  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `2.9`)  
+**Current version:** V3.0-Collapsible notes and heat bins  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `3.0`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -18,7 +18,7 @@ This site shows closed-home prices from central Los Angeles out to Santa Barbara
 
 On open, the view sits at latitude 34.12, longitude -118.55, zoom 9. The detail panel opens on Arcadia (`SG09`, ZIP 91006). The map can be panned and zoomed from level 7 through 16.
 
-**Four price metrics.** The header has four buttons: (a) median, (b) average, (c) minimum, and (d) maximum. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. Color breaks are: under $900K green, $900K to $1.4M gold, $1.4M to $2.2M orange, $2.2M to $3.5M red, and above $3.5M violet.
+**Four price metrics.** The header has four buttons: (a) median, (b) average, (c) minimum, and (d) maximum. Choosing one repaints every cell and rewrites the short price tag on that metric. The legend title follows the same choice. All four metrics share 16 dollar bins: under $400K, then $400–500K, $500–600K, $600–700K, $700–800K, $800–900K, $900K–$1.0M, $1.0–1.2M, $1.2–1.4M, $1.4–1.6M, $1.6–1.8M, $1.8–2.2M, $2.2–2.8M, $2.8–3.6M, $3.6–5.0M, and $5.0M or more. Colors run from cyan and green through yellow, orange, and red, then into purple. A cell with no figure for that metric is gray, labeled 「无数据」 in the legend.
 
 **Basemap switcher.** Four free basemaps sit at the map’s upper right. None of them needs an API key:
 
@@ -39,7 +39,9 @@ The active basemap button is indigo.
 
 **Cell labels.** 「显示网格标签」 is on by default. Each cell then shows a dark tag such as `$1.95M`. Turning it off leaves only the colored cells.
 
-**Hover, select, and popup.** Hovering a cell thickens its outline and deepens the fill. Clicking it loads that area in the side panel and turns the outline white. Clicking again opens a dark popup with all four prices.
+**Hover, select, and popup.** Hovering a cell thickens its outline and deepens the fill. Clicking it loads that area in the side panel and turns the outline white. Clicking again opens a popup with all four prices.
+
+**Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
 
 **Detail panel.** The panel shows the corridor, cell id, bilingual name, and description; four price cards; a bar from the low to the high, with a white mark for the median and a green mark for the average, plus how far the average sits above the median; and the 90-day sales count, price per square foot, and cell id.
 
@@ -53,7 +55,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `2.9`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, median slider, and search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `3.0`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 331 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `url`, and `desc`. `sales` is the trailing-three-month count. `ppsf` is dollars per square foot as published by Redfin, not per square meter. `avg`, `min`, `max`, and `ppsf` are `null` when the sample is too small or the figure is unpublished. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -68,6 +70,14 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V3.0-Collapsible notes and heat bins
+
+**Date:** 2026-10-31
+
+The right-hand notes column can be collapsed. The button sits under the basemap switcher. It reads 「收起说明」 while the column is open and 「显示说明」 while it is closed. A wide screen opens with the column visible. At 800 pixels and below it starts closed, and opening it covers the right side of the map while the map stays full width. Selecting a cell still writes into the panel.
+
+The price heat scale grew from 5 bins to 16. All four price metrics share the same dollar breaks. The lowest median is about $425K, and nearly half the cells sit between $400K and $1.0M, so that band is split every $100K. From $1.0M to $1.8M the step is $200K. Above that the steps widen, and $5.0M or more is the top bin. Cells with no figure are gray. The cell count and the sales figures are unchanged.
 
 ### V2.9-Data separated
 

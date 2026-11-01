@@ -1,5 +1,5 @@
 {
-  "version": "2.9",
+  "version": "3.0",
   "project": "LA Area Housing Map",
   "notes": {
     "sales": "近三个月成交套数，一般是 Redfin 公布的最近三个月套数之和。",
