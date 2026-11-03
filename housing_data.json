@@ -1,5 +1,5 @@
 {
-  "version": "4.6",
+  "version": "4.7",
   "project": "LA Area Housing Map",
   "notes": {
     "sales": "顶层 sales 是近三个月成交套数，一般是 Redfin 公布的最近三个月套数之和。m6、m9、m12 里的 sales 分别是近 6、9、12 个月，尚未采集时为 null。",

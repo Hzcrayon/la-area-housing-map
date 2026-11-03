@@ -4,7 +4,7 @@
 
 **打开地图：** https://hzcrayon.github.io/la-area-housing-map/
 
-当前版本 **4.6**。
+当前版本 **4.7**。
 
 ## 地图上能做什么
 
@@ -12,6 +12,7 @@
 - 在近 3、6、9、12 个月之间切换。中城、西区、圣费尔南多谷、圣盖博谷、东南洛杉矶和长滩已经有更长的历史，其余地区还会逐批补上
 - 按价格、治安和到 USC 的车程筛选
 - 点开一个格子，查看区域说明，并跳到它的 Redfin 页面
+- 在手机上把顶部菜单收到上方，把左下角图例收到左边，先看地图
 
 每一版改了什么，写在 `DEVELOPER_LOG.zh.md`。英文版是 `DEVELOPER_LOG.en.md`。
 
@@ -24,7 +25,7 @@
 
 ## 项目文件
 
-- `index.html`：页面。标题、页眉徽章和 `application-version` 都是 `4.6`
+- `index.html`：页面。标题、页眉徽章和 `application-version` 都是 `4.7`
 - `housing_data.json`：506 个网格的成交价、简介、便利性、治安和到 USC 的车程
 - `app.js`：地图、热力图、筛选和底图
 - `start_windows.bat`：Windows 一键启动

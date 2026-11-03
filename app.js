@@ -850,6 +850,38 @@ document.getElementById('panel-toggle').addEventListener('click', () => {
   setPanelOpen(open);
 });
 
+function setHeaderOpen(open, persist) {
+  document.body.classList.toggle('header-collapsed', !open);
+  document.documentElement.classList.remove('header-start-collapsed');
+  const btn = document.getElementById('header-toggle');
+  btn.textContent = open ? '收起菜单' : '显示菜单';
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (persist) {
+    try { localStorage.setItem('la-housing-header-open', open ? '1' : '0'); } catch (e) {}
+  }
+  refreshMapSize();
+}
+
+function setLegendOpen(open, persist) {
+  document.getElementById('legend-box').classList.toggle('legend-collapsed', !open);
+  document.documentElement.classList.remove('legend-start-collapsed');
+  const btn = document.getElementById('legend-toggle');
+  btn.textContent = open ? '收起图例' : '图例';
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (persist) {
+    try { localStorage.setItem('la-housing-legend-open', open ? '1' : '0'); } catch (e) {}
+  }
+}
+
+setHeaderOpen(!document.documentElement.classList.contains('header-start-collapsed'), false);
+setLegendOpen(!document.documentElement.classList.contains('legend-start-collapsed'), false);
+document.getElementById('header-toggle').addEventListener('click', () => {
+  setHeaderOpen(document.body.classList.contains('header-collapsed'), true);
+});
+document.getElementById('legend-toggle').addEventListener('click', () => {
+  setLegendOpen(document.getElementById('legend-box').classList.contains('legend-collapsed'), true);
+});
+
 function panelLimits() {
   const viewport = window.innerWidth;
   const overlay = viewport <= 800;

@@ -3,8 +3,8 @@
 **Project:** LA Area Housing Map  
 **Chinese name:** LA 周边住房地图
 
-**Current version:** V4.6-San Gabriel and southeast history  
-**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.6`)  
+**Current version:** V4.7-Phone menu and legend  
+**Page entry:** `index.html` (the title, header badge, and `<meta name="application-version">` all read `4.7`)  
 **This file:** `DEVELOPER_LOG.en.md`  
 **Chinese log:** `DEVELOPER_LOG.zh.md`
 
@@ -60,6 +60,8 @@ The active basemap button is indigo.
 
 **Cell labels.** On a price map, 「显示网格标签」 starts checked. Each cell then shows a dark tag such as `$1.95M`. Turning it off leaves only the colored cells. Switching to safety or drive time clears the check, so those maps open without numbers. Checking it again shows the tier number or the minutes. Switching back to a price map restores that map’s previous check.
 
+**The menu and legend can be tucked away.** Under the header, 「收起菜单」 slides the whole menu up and leaves 「显示菜单」. On the legend, 「收起图例」 slides the legend to the left edge and leaves a vertical 「图例」. Either one opens again with another tap. At 800 pixels wide and below, both start tucked away so the map is visible first. A wide screen starts with both open. The choice is stored in that browser.
+
 **Hover, select, and popup.** Hovering a cell thickens its outline and deepens the fill. Clicking it loads that area in the side panel and turns the outline white. Clicking again opens a popup with all four prices.
 
 **Side panel.** Under the basemap buttons, 「收起说明」 / 「显示说明」 hides or shows the whole right column (the write-up and the comparison list). The column’s left edge can be dragged. On a wide screen the narrowest open width is about 300 pixels. The widest is the window width minus about 200 pixels, and never more than about 1280. On a narrow screen the column covers the map, from about 260 pixels up to nearly the whole window. Dragging stops at the minimum width and does not close the column. The four price cards stack in one column below about 360 pixels, sit in two columns through the middle widths, and line up in one row from about 560 pixels up. At that wider size the introduction sits beside errands, and safety sits beside the drive to USC. In a narrow column the sales count, price per square foot, and cell id stack vertically. Only 「收起说明」 hides it. On a wide screen the column starts open. At 800 pixels wide and below it starts closed; opening it lays the column over the map, and the map keeps its full width. Selecting a cell still updates the write-up while the column is closed.
@@ -78,7 +80,7 @@ This is a static site. There is no build step and no backend. The browser loads 
 
 | File | Role |
 |---|---|
-| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.6`. The project name is LA Area Housing Map. |
+| `index.html` | Page shell. The header holds the metric buttons, day/night switch, corridor filter, four price-cap sliders, the price search, and the place search box. The center holds the map, basemap switcher, and legend. The right side holds the detail panel and comparison table. Styling comes from the Tailwind CDN. The map library is Leaflet 1.9.4. The title, header badge, and `application-version` all read `4.7`. The project name is LA Area Housing Map. |
 | `housing_data.json` | The sales database, 506 records, kept out of the page code. Each record has `id`, `name`, `region`, center `lat`/`lng`, half-size `dLat`/`dLng`, `median`, `avg`, `min`, `max`, `sales`, `ppsf`, `m6`, `m9`, `m12`, `url`, `desc`, `shops`, `safety`, and `uscMin`. The top-level six figures are the trailing three months. `m6`, `m9`, and `m12` are the 6-, 9-, and 12-month windows. Batches 1 through 3 are filled; the rest are `null`. `ppsf` is dollars per square foot as published by Redfin, not per square meter. |
 | `app.js` | Map setup, the four free tile sources, cell drawing, filters, selection, the comparison table, and the day/night switch. `createBasemap()` builds one tile layer or a group. The dark style stacks a dark gray base under a label layer. |
 | `start_windows.bat` | Windows launcher. With Python it serves the folder on port 8080 and opens a browser. Without Python it runs `serve_local.ps1`. |
@@ -93,6 +95,12 @@ This is a static site. There is no build step and no backend. The browser loads 
 ## 3. Version History
 
 When the project changes again, add the new version at the top of this section. The heading is `Vversion-name`. Do not use the date as the heading, and do not start a third log. Also change the version in `index.html`: the `<title>`, the header `vX.Y` badge, and `<meta name="application-version">`. All three must match. The Chinese log uses the same version number and its own Chinese name.
+
+### V4.7-Phone menu and legend
+
+**Date:** 2026-11-03
+
+On a phone, the header and the legend covered most of the map. The header can now slide up, and the legend can slide to the left edge. Each leaves a button that opens it again. At 800 pixels and below, both start closed. A wide screen starts with both open. The choice is stored in the browser. No sale figures were changed.
 
 ### V4.6-San Gabriel and southeast history
 

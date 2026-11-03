@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Area Housing Map v4.6</title>
-  <meta name="application-version" content="4.6" />
+  <title>LA Area Housing Map v4.7</title>
+  <meta name="application-version" content="4.7" />
   <script>
     try {
       if (localStorage.getItem('la-housing-theme-v131') !== '1') {
@@ -16,6 +16,19 @@
       }
       if (window.matchMedia('(max-width: 800px)').matches) {
         document.documentElement.classList.add('panel-start-collapsed');
+      }
+      var narrowStart = window.matchMedia('(max-width: 800px)').matches;
+      function chromeOpen(key, fallback) {
+        var saved = localStorage.getItem(key);
+        if (saved === '1') return true;
+        if (saved === '0') return false;
+        return fallback;
+      }
+      if (!chromeOpen('la-housing-header-open', !narrowStart)) {
+        document.documentElement.classList.add('header-start-collapsed');
+      }
+      if (!chromeOpen('la-housing-legend-open', !narrowStart)) {
+        document.documentElement.classList.add('legend-start-collapsed');
       }
     } catch (e) {}
   </script>
@@ -145,10 +158,57 @@
     }
     .legend-swatch.span-2 { grid-column: 1 / -1; }
     #legend-box {
-      width: min(272px, calc(100vw - 1.25rem));
+      display: flex;
+      align-items: stretch;
+      z-index: 620;
+      max-width: min(340px, calc(100vw - 1.25rem));
+      overflow: hidden;
+      padding: 0;
+    }
+    #legend-body {
+      width: min(272px, calc(100vw - 3.5rem));
       max-height: min(46vh, 340px);
       overflow: auto;
+      padding: 12px;
     }
+    #legend-toggle {
+      flex: 0 0 auto;
+      border: 0;
+      border-left: 1px solid rgba(148, 163, 184, 0.35);
+      background: transparent;
+      color: inherit;
+      writing-mode: vertical-rl;
+      min-width: 36px;
+      min-height: 72px;
+      padding: 10px 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+    }
+    #legend-box.legend-collapsed,
+    html.legend-start-collapsed #legend-box {
+      left: 0;
+      bottom: 28%;
+      max-width: none;
+      border-radius: 0 12px 12px 0;
+    }
+    #legend-box.legend-collapsed #legend-body,
+    html.legend-start-collapsed #legend-box #legend-body { display: none; }
+    #legend-box.legend-collapsed #legend-toggle,
+    html.legend-start-collapsed #legend-box #legend-toggle { border-left: 0; }
+    #header-toggle {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      min-height: 36px;
+      border: 0;
+      cursor: pointer;
+      z-index: 21;
+    }
+    html.header-start-collapsed #app-header,
+    body.header-collapsed #app-header { display: none; }
     #detail-panel {
       position: relative;
       width: 24rem;
@@ -218,7 +278,7 @@
         z-index: 30;
         box-shadow: -12px 0 28px rgba(15, 23, 42, 0.28);
       }
-      #legend-box { max-height: 42vh; overflow: auto; }
+      #legend-body { max-height: 42vh; }
     }
     html.panel-start-collapsed #detail-panel,
     #workspace.panel-collapsed #detail-panel { display: none; }
@@ -227,13 +287,13 @@
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen overflow-hidden">
 
   <!-- Top Control Header -->
-  <header class="bg-slate-900/95 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 z-20 shadow-lg">
+  <header id="app-header" class="bg-slate-900/95 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 z-20 shadow-lg">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow">LA</div>
       <div>
         <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
           LA Area Housing Map
-          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.6</span>
+          <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/40">v4.7</span>
         </h1>
         <p class="text-xs text-slate-400">LA 周边住房成交热力网格 · 覆盖 506 个高密度细分网格 · 四维成交价参数实时切换</p>
       </div>
@@ -383,6 +443,7 @@
 
       <input id="search-input" type="text" placeholder="搜索城市/区名 (如 Arcadia, Santa Barbara)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-52" />
   </header>
+  <button id="header-toggle" type="button" class="bg-slate-900/95 border-b border-slate-800 text-xs font-semibold text-slate-300" aria-expanded="true" aria-controls="app-header">收起菜单</button>
 
   <!-- Main Workspace -->
   <div id="workspace" class="flex-1 flex overflow-hidden relative">
@@ -405,12 +466,15 @@
       </div>
 
       <!-- Legend (Bottom Left) -->
-      <div id="legend-box" class="absolute bottom-5 left-4 z-10 bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl p-3 shadow-xl">
-        <div class="text-xs font-semibold text-slate-200 mb-1" id="legend-title">价格热力图例 (a) 成交中位价</div>
-        <label class="flex items-center gap-1 text-[11px] text-slate-400 cursor-pointer">
-          <input type="checkbox" id="toggle-labels" checked class="accent-indigo-500" /> 显示网格标签
-        </label>
-        <div id="legend-scale"></div>
+      <div id="legend-box" class="absolute bottom-5 left-4 z-10 bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl shadow-xl">
+        <div id="legend-body">
+          <div class="text-xs font-semibold text-slate-200 mb-1" id="legend-title">价格热力图例 (a) 成交中位价</div>
+          <label class="flex items-center gap-1 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="toggle-labels" checked class="accent-indigo-500" /> 显示网格标签
+          </label>
+          <div id="legend-scale"></div>
+        </div>
+        <button id="legend-toggle" type="button" class="text-slate-300" aria-expanded="true" aria-controls="legend-body">收起图例</button>
       </div>
     </div>
 
